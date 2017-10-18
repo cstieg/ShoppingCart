@@ -68,9 +68,14 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Readme.md" />
     <None Include="ShotgunAdapters.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ControllerHelper\ControllerHelper\ControllerHelper.csproj">
+      <Project>{c8db3f11-651c-4a00-b2d6-650700d0007f}</Project>
+      <Name>ControllerHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Geography\Geography\Geography.csproj">
       <Project>{c68013c0-5ecd-4c34-ae72-07f6742efb70}</Project>
       <Name>Geography</Name>
