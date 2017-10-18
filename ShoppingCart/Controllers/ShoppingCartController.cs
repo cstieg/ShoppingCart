@@ -17,7 +17,7 @@ namespace _____________.Controllers
     {
         // if using ShoppingCart.PayPal, uncomment this next line and delete the following
         //ClientInfo ClientInfo = new PayPalApiClient().GetClientSecrets();
-        object ClientInfo = new object() { };
+        object ClientInfo = null;
 
         ApplicationDbContext db = new ApplicationDbContext();
 

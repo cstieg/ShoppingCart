@@ -70,6 +70,7 @@
   <ItemGroup>
     <None Include="Readme.md" />
     <None Include="ShotgunAdapters.pfx" />
+    <None Include="Views\ShoppingCart\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ControllerHelper\ControllerHelper\ControllerHelper.csproj">
@@ -84,6 +85,9 @@
       <Project>{890d5c31-8e0c-40f9-94de-36b4fddb2aae}</Project>
       <Name>SessionHelper</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\ShoppingCart.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

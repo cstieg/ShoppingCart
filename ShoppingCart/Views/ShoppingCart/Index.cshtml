@@ -1,0 +1,92 @@
+﻿@model Cstieg.ShoppingCart.ShoppingCart
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<h1>Shopping Cart</h1>
+<hr />
+
+<div class="container">
+    <div class="row item-detail-header">
+        <div class="col-xs-5 col-sm-6 col-md-5 col-lg-5 item-name">Product</div>
+        <div class="hidden-xs col-sm-2 col-md-1 col-lg-1 item-unit-price">Unit Price</div>
+        <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2 item-quantity">Quantity</div>
+        <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-extended-price">Price</div>
+        <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-shipping">Shipping</div>
+        <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 item-total-price">Total Price</div>
+        <div class="col-xs-1"></div>
+    </div>
+    <hr />
+    @if (Model != null && Model.GetItems().Count != 0)
+    {
+        foreach (var item in Model.GetItems())
+        {
+            <div class="row item-detail-line" id="item-@item.Product.Id">
+                <div class="col-xs-5 col-sm-6 col-md-5 col-lg-5 item-name">@item.Product.Name</div>
+                <div class="hidden-xs col-sm-2 col-md-1 col-lg-1 item-unit-price">$@item.UnitPrice</div>
+                <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2 item-quantity">
+                    @if (!item.IsPromotionalItem)
+                    {
+                        <button onclick="decrementItemInShoppingCart(@item.Product.Id)">-</button>
+                    }
+                    <span class="item-qty-ct" id="qty-@item.Product.Id">@item.Quantity</span>
+                    @if (!item.IsPromotionalItem)
+                    {
+                        <button onclick="incrementItemInShoppingCart(@item.Product.Id)">+</button>
+                    }
+                </div>
+                <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-extended-price">$@item.ExtendedPrice</div>
+                <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-shipping">$@item.Shipping</div>
+                <div class="item-shipping-saved hidden">@item.Shipping</div>
+                <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 item-total-price">$@item.TotalPrice</div>
+                <div class="col-xs-1">
+                    <button onclick="removeItemInShoppingCart(@item.Product.Id)">x</button>
+                </div>
+            </div>
+        }
+
+        <hr />
+        <div class="row item-detail-total">
+            <div class="col-xs-5 col-sm-6 col-md-5 col-lg-5 item-name">TOTAL:</div>
+            <div class="hidden-xs col-sm-2 col-md-1 col-lg-1 item-unit-price"></div>
+            <div class="col-xs-4 col-sm-2 col-md-2 col-lg-2 item-quantity"></div>
+            <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-extended-price">$@Model.TotalExtendedPrice</div>
+            <div class="hidden-xs hidden-sm col-md-1 col-lg-1 item-shipping">$@Model.TotalShipping</div>
+            <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 item-total-price">$@Model.GrandTotal</div>
+            <div class="col-xs-1"></div>
+        </div>
+
+        <hr />
+        if (ViewBag.ClientInfo != null)
+        {
+            <div class="clearfix"></div>
+            <hr />
+            <div class="pull-right">
+                <div id="paypal-button-container"></div>
+                <p class="text-right">Please click the PayPal button to pay</p>
+                <br />
+                <div class="pull-right" id="no-paypal">
+                    <h4 class="text-center">No PayPal?</h4>
+                    <p>To pay with credit card, click on the PayPal button above, and choose the Pay with Debit or Credit Card option.</p>
+                </div>
+            </div>
+
+            <div class="hidden">
+                <span id="paypalClientId">@ViewBag.ClientInfo.ClientId</span>
+                <span id="paypalMode">@ViewBag.ClientInfo.Mode</span>
+                <span id="paypalLoginReturnId">@ViewBag.ClientInfo.ReturnUrl</span>
+            </div>
+            <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+            <script src="~/Scripts/Site/paypal.js"></script>
+        }
+
+    }
+    else
+    {
+        <div class="row">
+            <h3>No Items in Shopping Cart</h3>
+            <p>Go back to @Html.ActionLink("product catalog", "Products", "Home")</p>
+        </div>
+    }
+
+</div>
