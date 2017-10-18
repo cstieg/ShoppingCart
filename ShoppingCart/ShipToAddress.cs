@@ -7,10 +7,10 @@ namespace Cstieg.ShoppingCart
     /// <summary>
     /// Model of an Address
     /// </summary>
-    public class Address : AddressBase
+    public class ShipToAddress : AddressBase
     {
         [Key]
-        public int Id { get; set; }
+        public override int Id { get; set; }
 
         [ForeignKey("Customer")]
         public int ?CustomerId { get; set; }

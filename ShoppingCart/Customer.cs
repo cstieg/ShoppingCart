@@ -12,7 +12,7 @@ namespace Cstieg.ShoppingCart
     {
         public Customer()
         {
-            Addresses = new List<Address>();
+            Addresses = new List<ShipToAddress>();
         }
 
         [Key]
@@ -31,7 +31,7 @@ namespace Cstieg.ShoppingCart
         public string EmailAddress { get; set; }
 
         [InverseProperty("Customer")]
-        public virtual ICollection<Address> Addresses { get; set; }
+        public virtual ICollection<ShipToAddress> Addresses { get; set; }
 
         public override string ToString()
         {

@@ -14,6 +14,8 @@ namespace Cstieg.ShoppingCart
 
         public Order()
         {
+            ShipToAddress = new ShipToAddress();
+            BillToAddress = new ShipToAddress();
             OrderDetails = new List<OrderDetail>();
         }
 
@@ -26,11 +28,11 @@ namespace Cstieg.ShoppingCart
 
         [ForeignKey("ShipToAddress")]
         public int ShipToAddressId { get; set; }
-        public virtual Address ShipToAddress { get; set; }
+        public virtual ShipToAddress ShipToAddress { get; set; }
 
         [ForeignKey("BillToAddress")]
         public int BillToAddressId { get; set; }
-        public virtual Address BillToAddress { get; set; }
+        public virtual ShipToAddress BillToAddress { get; set; }
 
         [InverseProperty("Order")]
         public virtual List<OrderDetail> OrderDetails { get; set; }

@@ -6,7 +6,7 @@ namespace Cstieg.ShoppingCart
     /// <summary>
     /// Model of a Product to be sold in a shopping cart
     /// </summary>
-    public class Product
+    public class ProductBase
     {
         [Key]
         public int Id { get; set; }

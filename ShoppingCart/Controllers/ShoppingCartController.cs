@@ -14,7 +14,6 @@ namespace Cstieg.ShoppingCart
         object ClientInfo = new object() { };
 
         //private DbContext db = new DbContext();
-        private object db = new object() { };
 
         // GET: ShoppingCart
         public ActionResult Index()

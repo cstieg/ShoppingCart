@@ -16,12 +16,7 @@ namespace Cstieg.ShoppingCart
         /// </summary>
         public ShoppingCart()
         {
-            Order = new Order
-            {
-                BillToAddress = new Address(),
-                ShipToAddress = new Address(),
-                OrderDetails = new List<OrderDetail>()
-            };
+            Order = new Order();
             PromoCodes = new List<PromoCode>();
         }
 
@@ -66,16 +61,11 @@ namespace Cstieg.ShoppingCart
         }
 
 
-        //TODO: Should bifurcate adding and incrementing
-        // adding already existing product should throw an exception, to be caught and handled, possibly with no effect
-
-
-
         /// <summary>
         /// Adds a product to the shopping cart
         /// </summary>
         /// <param name="product">The Product to add</param>
-        public void AddProduct(Product product)
+        public void AddProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (orderDetail == null)
@@ -100,7 +90,7 @@ namespace Cstieg.ShoppingCart
         /// Increments the quantity of a product in the shopping cart
         /// </summary>
         /// <param name="product">The Product whose quantity to increment</param>
-        public void IncrementProduct(Product product)
+        public void IncrementProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (orderDetail == null)
@@ -117,7 +107,7 @@ namespace Cstieg.ShoppingCart
         /// Decrements the quantity of a product in the shopping cart, removes if none remaining after decrement
         /// </summary>
         /// <param name="product">The Product whose quantity to decrement</param>
-        public void DecrementProduct(Product product)
+        public void DecrementProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (!(orderDetail == null) && orderDetail.Quantity > 0)
@@ -134,7 +124,7 @@ namespace Cstieg.ShoppingCart
         /// Removes all quantities of a product in the shopping cart, clears all promocodes if no items remain
         /// </summary>
         /// <param name="product">The Product to remove</param>
-        public void RemoveProduct(Product product)
+        public void RemoveProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (!(orderDetail == null))

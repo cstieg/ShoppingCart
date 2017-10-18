@@ -10,10 +10,13 @@ namespace Cstieg.ShoppingCart
     /// </summary>
     public class OrderDetail
     {
+        [Key]
+        public int Id { get; set; }
+
         [ForeignKey("Product")]
         [Required]
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public virtual ProductBase Product { get; set; }
 
         [Required]
         [Display(Name = "Placed in Cart")]
@@ -31,7 +34,7 @@ namespace Cstieg.ShoppingCart
         [ForeignKey("Order")]
         [Required]
         public int OrderId { get; set; }
-        public Order Order { get; set; }
+        public virtual Order Order { get; set; }
 
         [Display(Name = "Promotional Item")]
         public bool IsPromotionalItem { get; set; }
