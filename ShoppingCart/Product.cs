@@ -9,30 +9,27 @@ namespace Cstieg.ShoppingCart
     public class ProductBase
     {
         [Key]
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 2)]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
         [StringLength(100)]
-        public string Description { get; set; }
+        public virtual string Description { get; set; }
 
-        public decimal Price { get; set; }
+        public virtual decimal Price { get; set; }
 
-        public decimal Shipping { get; set; }
+        public virtual decimal Shipping { get; set; }
 
-        [DisplayName("Upload image file")]
-        public string ImageUrl { get; set; }
-        public string ImageSrcSet { get; set; }
+        [DisplayName("Product Image")]
+        public virtual string ImageUrl { get; set; }
+        public virtual string ImageSrcSet { get; set; }
+        
+        [Display(Name = "Featured")]
+        public virtual bool DisplayOnFrontPage { get; set; }
 
-        [StringLength(50)]
-        public string Category { get; set; }
-
-        [Display(Name = "Display on Front Page")]
-        public bool DisplayOnFrontPage { get; set; }
-
-        [Display(Name = "Do Not Display (Promotional Item)")]
-        public bool DoNotDisplay { get; set; }
+        [Display(Name = "No Display")]
+        public virtual bool DoNotDisplay { get; set; }
     }
 }
