@@ -71,6 +71,7 @@
     <None Include="Readme.md" />
     <None Include="ShotgunAdapters.pfx" />
     <None Include="Views\ShoppingCart\Index.cshtml" />
+    <None Include="Views\ShoppingCart\OrderSuccess.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ControllerHelper\ControllerHelper\ControllerHelper.csproj">
@@ -87,7 +88,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\ShoppingCart.js" />
+    <Content Include="Scripts\Site\ShoppingCart.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

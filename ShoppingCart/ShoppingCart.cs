@@ -67,23 +67,20 @@ namespace Cstieg.ShoppingCart
         /// <param name="product">The Product to add</param>
         public void AddProduct(ProductBase product)
         {
-            OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
-            if (orderDetail == null)
-            {
-                orderDetail = new OrderDetail()
-                {
-                    Product = product,
-                    PlacedInCart = DateTime.Now,
-                    Quantity = 1,
-                    UnitPrice = product.Price,
-                    Shipping = product.Shipping
-                };
-                Order.OrderDetails.Add(orderDetail);
-            }
-            else
+            if (Order.OrderDetails.Exists(p => p.Product.Id == product.Id))
             {
                 throw new Exception("Product is already in shopping cart!");
             }
+            
+            var orderDetail = new OrderDetail()
+            {
+                Product = product,
+                PlacedInCart = DateTime.Now,
+                Quantity = 1,
+                UnitPrice = product.Price,
+                Shipping = product.Shipping
+            };
+            Order.OrderDetails.Add(orderDetail);
         }
 
         /// <summary>
@@ -97,10 +94,8 @@ namespace Cstieg.ShoppingCart
             {
                 throw new Exception("Product is not in shopping cart!");
             }
-            else
-            {
-                orderDetail.Quantity++;
-            }
+
+            orderDetail.Quantity++;
         }
 
         /// <summary>

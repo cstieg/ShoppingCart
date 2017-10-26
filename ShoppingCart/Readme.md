@@ -19,3 +19,5 @@ Add @Scripts.Render statement for the bundle in _Layout.cshtml if not added to a
 
 Also in _Layout.cshtml, add the following code in a convenient place
 	<div id="anti-forgery-token" class="hidden">@Html.AntiForgeryToken()</div>
+
+Add ShoppingCart.PayPal module to pay with PayPal
