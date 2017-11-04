@@ -39,6 +39,10 @@
     <Reference Include="EntityFramework">
       <HintPath>..\Packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\ShotgunAdapters.com\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -63,11 +67,13 @@
     <Compile Include="PromoCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShoppingCart.cs" />
+    <Compile Include="WebImage.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Readme.md" />
     <None Include="ShotgunAdapters.pfx" />
     <None Include="Views\ShoppingCart\Index.cshtml" />
@@ -81,6 +87,10 @@
     <ProjectReference Include="..\..\Geography\Geography\Geography.csproj">
       <Project>{c68013c0-5ecd-4c34-ae72-07f6742efb70}</Project>
       <Name>Geography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Image\Image.csproj">
+      <Project>{ea5294a7-7f80-4da0-960b-0ae3d376c841}</Project>
+      <Name>Image</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\SessionHelper\SessionHelper\SessionHelper.csproj">
       <Project>{890d5c31-8e0c-40f9-94de-36b4fddb2aae}</Project>
