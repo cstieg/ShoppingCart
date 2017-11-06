@@ -22,6 +22,8 @@ namespace Cstieg.ShoppingCart
 
         public Order Order { get; set; }
 
+        public string Country { get; set; }
+
         public string PayeeEmail { get; set; }
 
         public List<PromoCode> PromoCodes { get; set; }
