@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Cstieg.ShoppingCart
+namespace Cstieg.Sales.Models
 {
     public class WebImage : WebImageBase
     {

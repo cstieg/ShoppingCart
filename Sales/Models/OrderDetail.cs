@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Cstieg.ShoppingCart
+namespace Cstieg.Sales.Models
 { 
     /// <summary>
     /// A order detail containing a quantity of a given product

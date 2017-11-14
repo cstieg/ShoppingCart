@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Web.Mvc;
 
-namespace Cstieg.ShoppingCart
+namespace Cstieg.Sales.Models
 {
     /// <summary>
     /// Model of a Product to be sold in a shopping cart
@@ -20,6 +20,10 @@ namespace Cstieg.ShoppingCart
         public virtual decimal Price { get; set; }
 
         public virtual decimal Shipping { get; set; }
+
+        [ForeignKey("ShippingScheme")]
+        public virtual int? ShippingSchemeId { get; set; }
+        public virtual ShippingScheme ShippingScheme { get; set; }
 
         [Display(Name = "Product Images")]
         [InverseProperty("Product")]

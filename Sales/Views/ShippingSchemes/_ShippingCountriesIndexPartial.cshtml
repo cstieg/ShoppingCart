@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Cstieg.Sales.Models.ShippingCountry>
+
+<p>
+    @Html.ActionLink("Create New", "Create", "ShippingCountries", new { id = ViewBag.ShippingSchemeId }, new { })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Country.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MinQty)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MaxQty)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AdditionalShipping)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Country.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MinQty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxQty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalShipping)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", "ShippingCountries", new { id = item.Id }, new { }) |
+                @Html.ActionLink("Details", "Details", "ShippingCountries", new { id = item.Id }, new { }) |
+                @Html.ActionLink("Delete", "Delete", "ShippingCountries", new { id = item.Id }, new { })
+            </td>
+        </tr>
+    }
+
+</table>
+

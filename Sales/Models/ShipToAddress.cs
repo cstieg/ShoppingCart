@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Cstieg.ShoppingCart
+namespace Cstieg.Sales.Models
 {
     /// <summary>
     /// Model of an Address

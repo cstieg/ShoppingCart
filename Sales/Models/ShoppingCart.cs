@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Cstieg.ShoppingCart
+namespace Cstieg.Sales.Models
 {
     /// <summary>
     /// A viewmodel container for an Order
@@ -12,7 +12,7 @@ namespace Cstieg.ShoppingCart
     public class ShoppingCart
     {
         /// <summary>
-        /// Constructor that initializes objects to avoid null object errorss
+        /// Constructor that initializes objects to avoid null object errors
         /// </summary>
         public ShoppingCart()
         {
@@ -83,13 +83,14 @@ namespace Cstieg.ShoppingCart
                 Shipping = product.Shipping
             };
             Order.OrderDetails.Add(orderDetail);
+            UpdateShippingCharges();
         }
 
         /// <summary>
         /// Increments the quantity of a product in the shopping cart
         /// </summary>
         /// <param name="product">The Product whose quantity to increment</param>
-        public void IncrementProduct(ProductBase product)
+        public OrderDetail IncrementProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (orderDetail == null)
@@ -98,13 +99,15 @@ namespace Cstieg.ShoppingCart
             }
 
             orderDetail.Quantity++;
+            UpdateShippingCharges();
+            return orderDetail;
         }
 
         /// <summary>
         /// Decrements the quantity of a product in the shopping cart, removes if none remaining after decrement
         /// </summary>
         /// <param name="product">The Product whose quantity to decrement</param>
-        public void DecrementProduct(ProductBase product)
+        public OrderDetail DecrementProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (!(orderDetail == null) && orderDetail.Quantity > 0)
@@ -115,6 +118,8 @@ namespace Cstieg.ShoppingCart
             {
                 RemoveProduct(product);
             }
+            UpdateShippingCharges();
+            return orderDetail;
         }
 
         /// <summary>
@@ -152,6 +157,29 @@ namespace Cstieg.ShoppingCart
             for (int i = 0; i < Order.OrderDetails.Count; i++)
             {
                 RemoveShippingCharges(Order.OrderDetails[i]);
+            }
+        }
+
+        /// <summary>
+        /// Updates the shipping charges based on the country and quantity of each item
+        /// </summary>
+        public void UpdateShippingCharges()
+        {
+            if (Country == null)
+            {
+                return;
+            }
+            foreach (var item in Order.OrderDetails)
+            {
+                List<ShippingCountry> ShippingCountries = (List<ShippingCountry>) item.Product.ShippingScheme.ShippingCountries;
+                var shippingCountry = ShippingCountries.Find(s => s.Country.IsoCode2 == Country
+                                                               && (s.MinQty == null || item.Quantity >= s.MinQty)
+                                                               && (s.MaxQty == null || item.Quantity <= s.MaxQty));
+                shippingCountry = shippingCountry ?? ShippingCountries.Find(s => s.Country.IsoCode2 == "--"
+                                                               && (s.MinQty == null || item.Quantity >= s.MinQty)
+                                                               && (s.MaxQty == null || item.Quantity <= s.MaxQty));
+                decimal additionalShipping = shippingCountry == null ? 0.0M : shippingCountry.AdditionalShipping;
+                item.Shipping = item.Product.Shipping + additionalShipping;
             }
         }
 

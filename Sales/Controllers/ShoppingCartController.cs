@@ -1,19 +1,20 @@
 ﻿/*
-using Cstieg.ControllerHelper;
-using Cstieg.ShoppingCart;
-// REPLACE WITH PROJECT NAMESPACE
-using ___________.Models;
 using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+using Cstieg.ControllerHelper;
+using Cstieg.Sales.Models;
+using Cstieg.Sales.PayPal;
+using ____________.Models;
 
-// REPLACE WITH PROJECT NAMESPACE
-namespace _____________.Controllers
+namespace ____________.Controllers
 {
     /// <summary>
     /// Controller to provide shopping cart view
     /// </summary>
-    public class ShoppingCartController : Controller
+    public class ShoppingCartController : BaseController
     {
         // if using ShoppingCart.PayPal, uncomment this next line and delete the following
         //ClientInfo ClientInfo = new PayPalApiClient().GetClientSecrets();
@@ -22,9 +23,10 @@ namespace _____________.Controllers
         ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: ShoppingCart
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             ViewBag.ClientInfo = ClientInfo;
+            ViewBag.Countries = await db.Countries.ToListAsync();
             ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
             return View(shoppingCart);
         }
@@ -33,7 +35,7 @@ namespace _____________.Controllers
         {
             return View();
         }
-        
+
         /// <summary>
         /// Gets the number of items in the shopping cart
         /// </summary>
@@ -48,15 +50,14 @@ namespace _____________.Controllers
             return Json(returnData, JsonRequestBehavior.AllowGet);
         }
 
-
         /// <summary>
         /// Adds a product to the shopping cart
         /// </summary>
         /// <param name="id">ID of Product model to add</param>
         /// <returns>JSON success response if successful, error response if product already exists</returns>
-        [HttpPost, ActionName("AddOrderDetailToShoppingCart")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddOrderDetailToShoppingCart(int id)
+        public ActionResult AddItem(int id)
         {
             // look up product entity
             Product product = db.Products.SingleOrDefault(m => m.Id == id);
@@ -88,7 +89,7 @@ namespace _____________.Controllers
         /// <returns>JSON success response</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult IncrementItemInShoppingCart(int id)
+        public ActionResult IncrementItem(int id)
         {
             // look up product entity
             Product product = db.Products.SingleOrDefault(m => m.Id == id);
@@ -103,9 +104,10 @@ namespace _____________.Controllers
             // Increment quantity and save shopping cart
             try
             {
-                shoppingCart.IncrementProduct(product);
+                var orderDetail = shoppingCart.IncrementProduct(product);
                 shoppingCart.SaveToSession(HttpContext);
-                return this.JOk();
+                return Json(orderDetail);
+                //return this.JOk();
             }
             catch (Exception e)
             {
@@ -119,9 +121,9 @@ namespace _____________.Controllers
         /// </summary>
         /// <param name="id">ID of the Product model qty to decrement</param>
         /// <returns>JSON success response</returns>
-        [HttpPost, ActionName("DecrementItemInShoppingCart")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DecrementItemInShoppingCart(int id)
+        public ActionResult DecrementItem(int id)
         {
             // look up product entity
             Product product = db.Products.SingleOrDefault(m => m.Id == id);
@@ -136,9 +138,10 @@ namespace _____________.Controllers
             // Decrement qty and update shopping cart in session
             try
             {
-                shoppingCart.DecrementProduct(product);
+                var orderDetail = shoppingCart.DecrementProduct(product);
                 shoppingCart.SaveToSession(HttpContext);
-                return this.JOk();
+                return Json(orderDetail);
+                //return this.JOk();
             }
             catch (Exception e)
             {
@@ -151,9 +154,9 @@ namespace _____________.Controllers
         /// </summary>
         /// <param name="id">ID of Product model to remove</param>
         /// <returns>JSON success response</returns>
-        [HttpPost, ActionName("RemoveItemInShoppingCart")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult RemoveItemInShoppingCart(int id)
+        public ActionResult RemoveItem(int id)
         {
             // look up product entity
             Product product = db.Products.SingleOrDefault(m => m.Id == id);
@@ -177,8 +180,18 @@ namespace _____________.Controllers
                 return this.JError(403, e.Message);
             }
         }
-       
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SetCountry()
+        {
+            string country = Request.Params.Get("country");
+            var cart = ShoppingCart.GetFromSession(HttpContext);
+            cart.Country = country;
+            cart.UpdateShippingCharges();
+            cart.SaveToSession(HttpContext);
+            return Json(cart);
+        }
     }
 }
 */
