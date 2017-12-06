@@ -68,5 +68,13 @@ namespace Cstieg.Sales.Models
                 return Subtotal + Shipping;
             }
         }
+
+        public void SetShippingByCountry(string countryCode)
+        {
+            foreach (var orderDetail in OrderDetails)
+            {
+                orderDetail.SetShippingByCountry(countryCode);
+            }
+        }
     }
 }

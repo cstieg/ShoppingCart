@@ -169,18 +169,7 @@ namespace Cstieg.Sales.Models
             {
                 return;
             }
-            foreach (var item in Order.OrderDetails)
-            {
-                List<ShippingCountry> ShippingCountries = (List<ShippingCountry>) item.Product.ShippingScheme.ShippingCountries;
-                var shippingCountry = ShippingCountries.Find(s => s.Country.IsoCode2 == Country
-                                                               && (s.MinQty == null || item.Quantity >= s.MinQty)
-                                                               && (s.MaxQty == null || item.Quantity <= s.MaxQty));
-                shippingCountry = shippingCountry ?? ShippingCountries.Find(s => s.Country.IsoCode2 == "--"
-                                                               && (s.MinQty == null || item.Quantity >= s.MinQty)
-                                                               && (s.MaxQty == null || item.Quantity <= s.MaxQty));
-                decimal additionalShipping = shippingCountry == null ? 0.0M : shippingCountry.AdditionalShipping;
-                item.Shipping = item.Product.Shipping + additionalShipping;
-            }
+            Order.SetShippingByCountry(Country);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -64,5 +65,21 @@ namespace Cstieg.Sales.Models
         {
             return Product.ToString() + " Qty " + Quantity.ToString();
         }
+
+        public void SetShippingByCountry(string countryCode)
+        {
+            List<ShippingCountry> shippingCountries = (List<ShippingCountry>) Product.ShippingScheme.ShippingCountries;
+            var shippingCountry = shippingCountries.Find(s => s.Country.IsoCode2 == countryCode
+                               && (s.MinQty == null || Quantity >= s.MinQty)
+                               && (s.MaxQty == null || Quantity <= s.MaxQty));
+            shippingCountry = shippingCountry ?? shippingCountries.Find(s => s.Country.IsoCode2 == "--"
+                                                           && (s.MinQty == null || Quantity >= s.MinQty)
+                                                           && (s.MaxQty == null || Quantity <= s.MaxQty));
+
+            decimal additionalShipping = shippingCountry == null ? 0.0M : shippingCountry.AdditionalShipping;
+            Shipping = Product.Shipping + additionalShipping;
+        }
+
+
     }
 }
