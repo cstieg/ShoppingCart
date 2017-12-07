@@ -16,6 +16,6 @@ namespace Cstieg.Sales.Models
         public string Description { get; set; }
 
         [InverseProperty("ShippingScheme")]
-        public virtual ICollection<ShippingCountry> ShippingCountries { get; set; }
+        public virtual List<ShippingCountry> ShippingCountries { get; set; }
     }
 }

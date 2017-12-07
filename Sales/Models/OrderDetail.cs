@@ -68,7 +68,7 @@ namespace Cstieg.Sales.Models
 
         public void SetShippingByCountry(string countryCode)
         {
-            List<ShippingCountry> shippingCountries = (List<ShippingCountry>) Product.ShippingScheme.ShippingCountries;
+            List<ShippingCountry> shippingCountries = Product.ShippingScheme.ShippingCountries;
             var shippingCountry = shippingCountries.Find(s => s.Country.IsoCode2 == countryCode
                                && (s.MinQty == null || Quantity >= s.MinQty)
                                && (s.MaxQty == null || Quantity <= s.MaxQty));
