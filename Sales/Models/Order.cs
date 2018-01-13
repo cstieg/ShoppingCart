@@ -12,6 +12,8 @@ namespace Cstieg.Sales.Models
     {
         public int Id { get; set; }
 
+        public string Cart { get; set; }
+
         public Order()
         {
             ShipToAddress = new ShipToAddress();
@@ -69,6 +71,31 @@ namespace Cstieg.Sales.Models
             }
         }
 
+        public string Description
+        {
+            get
+            {
+                string description = "";
+                switch (OrderDetails.Count)
+                {
+                    case 0:
+                        description = "Order with no products yet";
+                        break;
+                    case 1:
+                        description = OrderDetails[0].Product.Name + " - Qty: " + OrderDetails[0].Quantity;
+                        break;
+                    default:
+                        description = "Multiple products";
+                        break;
+                }
+                return description;
+            }
+        }
+
+        /// <summary>
+        /// Sets the shipping amount for each order detail in the order, based upon the country
+        /// </summary>
+        /// <param name="countryCode">The 2 digit ISO country code where the order will be shipped to</param>
         public void SetShippingByCountry(string countryCode)
         {
             foreach (var orderDetail in OrderDetails)
