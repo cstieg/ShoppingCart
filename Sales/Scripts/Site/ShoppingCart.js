@@ -50,7 +50,7 @@ function buyNow(id) {
             window.location = "/shoppingCart";
         },
         error: function (result) {
-            if (result.status = 403) {
+            if (result.status === 403) {
                 window.location = "/shoppingCart";
             }
             else {
@@ -205,7 +205,7 @@ function setCountry() {
         var $countryOption = $countrySelect.find('option[value="' + country + '"]');
 
         // Select 'other' if country is not in the list
-        if ($countryOption.length == 0) {
+        if ($countryOption.length === 0) {
             $countryOption = $countrySelect.find('option[value="--"]');
         }
         $countryOption.attr('selected', 'selected');
