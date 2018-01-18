@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
@@ -16,24 +15,21 @@ namespace Cstieg.Sales.Models
 
         public Order()
         {
-            ShipToAddress = new ShipToAddress();
-            BillToAddress = new ShipToAddress();
             OrderDetails = new List<OrderDetail>();
         }
 
         [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
 
-        [Required]
-        public DateTime DateOrdered { get; set; }
+        public DateTime? DateOrdered { get; set; }
 
         [ForeignKey("ShipToAddress")]
-        public int ShipToAddressId { get; set; }
+        public int? ShipToAddressId { get; set; }
         public virtual ShipToAddress ShipToAddress { get; set; }
 
         [ForeignKey("BillToAddress")]
-        public int BillToAddressId { get; set; }
+        public int? BillToAddressId { get; set; }
         public virtual ShipToAddress BillToAddress { get; set; }
 
         [InverseProperty("Order")]

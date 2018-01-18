@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -35,7 +36,8 @@ namespace Cstieg.Sales.Models
         [ForeignKey("Order")]
         [Required]
         public int OrderId { get; set; }
-        public virtual Order Order { get; set; }
+        [JsonIgnore]
+        public Order Order { get; set; }
 
         [Display(Name = "Promotional Item")]
         public bool IsPromotionalItem { get; set; }

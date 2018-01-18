@@ -17,37 +17,48 @@ namespace ____________.Controllers
     public class ShoppingCartController : BaseController
     {
         // if using ShoppingCart.PayPal, uncomment this next line and delete the following
-        //ClientInfo ClientInfo = new PayPalApiClient().GetClientSecrets();
-        object ClientInfo = null;
-
-        ApplicationDbContext db = new ApplicationDbContext();
+-       //ClientInfo ClientInfo = new PayPalApiClient().GetClientSecrets();
+-       object ClientInfo = null;
 
         // GET: ShoppingCart
         public async Task<ActionResult> Index()
         {
+            var db = new ApplicationDbContext();
             ViewBag.ClientInfo = ClientInfo;
             ViewBag.Countries = await db.Countries.ToListAsync();
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
+            ShoppingCart shoppingCart = await GetShoppingCart(db);
             return View(shoppingCart);
         }
 
-        public ActionResult OrderSuccess()
+        // GET: ShoppingCart/OrderSuccess?cart=DF39FEI314040
+        /// <summary>
+        /// Displays confirmation for completed order
+        /// </summary>
+        /// <param name="cart">Alphanumeric cart id assigned to order by PayPal</param>
+        public async Task<ActionResult> OrderSuccess()
         {
-            return View();
+            var db = new ApplicationDbContext();
+            string id = Request.Params.Get("cart");
+            Order order = await db.Orders.Include(o => o.Customer).Where(o => o.Cart == id).SingleOrDefaultAsync();
+            if (order == null)
+            {
+                return HttpNotFound();
+            }
+            int addressId = (int) order.ShipToAddressId;
+            ShipToAddress address = await db.Addresses.FindAsync(addressId);
+            order.ShipToAddress = address;
+            return View(order);
         }
-
+        
         /// <summary>
         /// Gets the number of items in the shopping cart
         /// </summary>
         /// <returns>A JSON object containing the number of items in the shopping cart in the field shoppingCartCount</returns>
-        public JsonResult ShoppingCartCount()
+        public async Task<JsonResult> ShoppingCartCount()
         {
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
-            object returnData = new
-            {
-                shoppingCartCount = shoppingCart.Order.OrderDetails.Count
-            };
-            return Json(returnData, JsonRequestBehavior.AllowGet);
+            var db = new ApplicationDbContext();
+            ShoppingCart shoppingCart = await GetShoppingCart(db);
+            return Json(new { shoppingCartCount = shoppingCart.Order.OrderDetails.Count }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -57,28 +68,26 @@ namespace ____________.Controllers
         /// <returns>JSON success response if successful, error response if product already exists</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddItem(int id)
+        public async Task<ActionResult> AddItem(int id)
         {
+            var db = new ApplicationDbContext();
             // look up product entity
-            Product product = db.Products.SingleOrDefault(m => m.Id == id);
+            Product product = await db.Products.FindAsync(id);
             if (product == null)
             {
                 return HttpNotFound();
             }
 
-            // Retrieve shopping cart from session
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
-
-            // Add new order detail to session
             try
             {
+                ShoppingCart shoppingCart = await GetShoppingCart(db);
                 shoppingCart.AddProduct(product);
-                shoppingCart.SaveToSession(HttpContext);
+                await SaveShoppingCart(shoppingCart, db);
                 return this.JOk();
             }
             catch (Exception e)
             {
-                return this.JError(403, e.Message);
+                return this.JError(400, e.Message);
             }
         }
 
@@ -89,31 +98,28 @@ namespace ____________.Controllers
         /// <returns>JSON success response</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult IncrementItem(int id)
+        public async Task<ActionResult> IncrementItem(int id)
         {
+            var db = new ApplicationDbContext();
             // look up product entity
-            Product product = db.Products.SingleOrDefault(m => m.Id == id);
+            Product product = await db.Products.FindAsync(id);
             if (product == null)
             {
                 return HttpNotFound();
             }
 
-            // Retrieve shopping cart from session
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
-
             // Increment quantity and save shopping cart
             try
             {
+                ShoppingCart shoppingCart = await GetShoppingCart(db);
                 var orderDetail = shoppingCart.IncrementProduct(product);
-                shoppingCart.SaveToSession(HttpContext);
-                return Json(orderDetail);
-                //return this.JOk();
+                await SaveShoppingCart(shoppingCart, db);
+                return this.JOk(orderDetail);
             }
             catch (Exception e)
             {
-                return this.JError(403, e.Message);
+                return this.JError(400, e.Message);
             }
-
         }
 
         /// <summary>
@@ -123,29 +129,27 @@ namespace ____________.Controllers
         /// <returns>JSON success response</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DecrementItem(int id)
+        public async Task<ActionResult> DecrementItem(int id)
         {
+            var db = new ApplicationDbContext();
             // look up product entity
-            Product product = db.Products.SingleOrDefault(m => m.Id == id);
+            Product product = await db.Products.FindAsync(id);
             if (product == null)
             {
                 return HttpNotFound();
             }
 
-            // Retrieve shopping cart from session
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
-
-            // Decrement qty and update shopping cart in session
+            // Decrement qty and update shopping cart
             try
             {
+                ShoppingCart shoppingCart = await GetShoppingCart(db);
                 var orderDetail = shoppingCart.DecrementProduct(product);
-                shoppingCart.SaveToSession(HttpContext);
-                return Json(orderDetail);
-                //return this.JOk();
+                await SaveShoppingCart(shoppingCart, db);
+                return this.JOk(orderDetail);
             }
             catch (Exception e)
             {
-                return this.JError(403, e.Message);
+                return this.JError(400, e.Message);
             }
         }
 
@@ -156,23 +160,21 @@ namespace ____________.Controllers
         /// <returns>JSON success response</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult RemoveItem(int id)
+        public async Task<ActionResult> RemoveItem(int id)
         {
-            // look up product entity
-            Product product = db.Products.SingleOrDefault(m => m.Id == id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-
-            // Retrieve shopping cart from session
-            ShoppingCart shoppingCart = ShoppingCart.GetFromSession(HttpContext);
-
-            // Remove Product and update shopping cart in session
+            var db = new ApplicationDbContext();
             try
             {
-                shoppingCart.RemoveProduct(product);
-                shoppingCart.SaveToSession(HttpContext);
+                ShoppingCart shoppingCart = await GetShoppingCart(db);
+                OrderDetail orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == id);
+                if (orderDetail == null)
+                {
+                    return HttpNotFound();
+                }
+
+                db.OrderDetails.Remove(orderDetail);
+                await db.SaveChangesAsync();
+
                 return this.JOk();
             }
             catch (Exception e)
@@ -183,15 +185,27 @@ namespace ____________.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SetCountry()
+        public async Task<ActionResult> SetCountry()
         {
+            var db = new ApplicationDbContext();
             string country = Request.Params.Get("country");
-            var cart = ShoppingCart.GetFromSession(HttpContext);
-            cart.Country = country;
-            cart.UpdateShippingCharges();
-            cart.SaveToSession(HttpContext);
-            return Json(cart);
+            ShoppingCart shoppingCart = await GetShoppingCart(db);
+
+            shoppingCart.Country = country;
+            shoppingCart.UpdateShippingCharges();
+
+            try
+            {
+                await SaveShoppingCart(shoppingCart, db);
+            }
+            catch (Exception e)
+            {
+                return this.JError(400, e.Message);
+            }
+            return this.JOk(shoppingCart);
         }
+
     }
 }
+
 */

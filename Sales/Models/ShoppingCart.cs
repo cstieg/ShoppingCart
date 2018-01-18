@@ -1,8 +1,7 @@
-﻿using Cstieg.SessionHelper;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
 
 namespace Cstieg.Sales.Models
 {
@@ -19,6 +18,12 @@ namespace Cstieg.Sales.Models
             Order = new Order();
             PromoCodes = new List<PromoCode>();
         }
+
+        [Key]
+        public int Id { get; set; }
+        
+        // Set by Request.AnonymousId
+        public string OwnerId { get; set; }
 
         public Order Order { get; set; }
 
@@ -67,7 +72,7 @@ namespace Cstieg.Sales.Models
         /// Adds a product to the shopping cart
         /// </summary>
         /// <param name="product">The Product to add</param>
-        public void AddProduct(ProductBase product)
+        public OrderDetail AddProduct(ProductBase product)
         {
             if (Order.OrderDetails.Exists(p => p.Product.Id == product.Id))
             {
@@ -84,6 +89,7 @@ namespace Cstieg.Sales.Models
             };
             Order.OrderDetails.Add(orderDetail);
             UpdateShippingCharges();
+            return orderDetail;
         }
 
         /// <summary>
@@ -126,7 +132,7 @@ namespace Cstieg.Sales.Models
         /// Removes all quantities of a product in the shopping cart, clears all promocodes if no items remain
         /// </summary>
         /// <param name="product">The Product to remove</param>
-        public void RemoveProduct(ProductBase product)
+        public OrderDetail RemoveProduct(ProductBase product)
         {
             OrderDetail orderDetail = Order.OrderDetails.Find(p => p.Product.Id == product.Id);
             if (!(orderDetail == null))
@@ -138,6 +144,7 @@ namespace Cstieg.Sales.Models
             {
                 PromoCodes.Clear();
             }
+            return orderDetail;
         }
 
         /// <summary>
@@ -251,32 +258,7 @@ namespace Cstieg.Sales.Models
             // Add promocode to list
             PromoCodes.Add(promoCode);
         }
-
-        /// <summary>
-        /// Gets the shopping cart from the session
-        /// </summary>
-        /// <param name="context">The HttpContext object from the controller</param>
-        /// <returns>The shopping cart object</returns>
-        public static ShoppingCart GetFromSession(HttpContextBase context)
-        {
-            ShoppingCart shoppingCart = context.Session.GetObjectFromJson<ShoppingCart>("_shopping_cart");
-            // Create new shopping cart if none is in session
-            if (shoppingCart == null)
-            {
-                shoppingCart = new ShoppingCart();
-            }
-            return shoppingCart;
-        }
-
-        /// <summary>
-        /// Saves the shopping cart to the session
-        /// </summary>
-        /// <param name="context">The HttpContext object from the controller</param>
-        public void SaveToSession(HttpContextBase context)
-        {
-            context.Session.SetObjectAsJson("_shopping_cart", this);
-        }
-
+       
         /// <summary>
         /// Calculates the price of an item with a given percent discount
         /// </summary>

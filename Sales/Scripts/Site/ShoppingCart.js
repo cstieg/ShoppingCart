@@ -6,7 +6,7 @@ function antiForgeryToken() {
 }
 
 // Handler for errors in post calls
-function shoppingCartPostError(xhr, httpStatusMessage) {
+function shoppingCartPostError(xhr) {
     var message = 'Error: ';
     if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
         message += '\n' + xhr.responseJSON.message;
@@ -31,7 +31,7 @@ function addToShoppingCart(id) {
         success: function (result) {
             incrementShoppingCartBadge();
         },
-        error: shoppingCartPostError
+        error: function (xhr) { shoppingCartPostError(xhr); }
     });
 }
 
@@ -54,7 +54,7 @@ function buyNow(id) {
                 window.location = "/shoppingCart";
             }
             else {
-                shoppingCartPostError();
+                shoppingCartPostError(result);
             }
         }
     });
@@ -72,10 +72,10 @@ function IncrementItem(id) {
         data: postData,
         dataType: 'json',
         success: function (result) {
-            refreshDetail(result);
+            refreshDetail(result.data);
             recalculate();
         },
-        error: shoppingCartPostError
+        error: function (xhr) { shoppingCartPostError(xhr); }
     });
 }
 
@@ -102,10 +102,10 @@ function DecrementItem(id) {
         data: postData,
         dataType: 'json',
         success: function (result) {
-            refreshDetail(result);
+            refreshDetail(result.data);
             recalculate();
         },
-        error: shoppingCartPostError
+        error: function (xhr) { shoppingCartPostError(xhr); }
     });
 }
 
@@ -131,7 +131,7 @@ function RemoveItem(id) {
             }
             recalculate();
         },
-        error: shoppingCartPostError
+        error: function (xhr) { shoppingCartPostError(xhr); }
     });
 }
 
@@ -225,11 +225,16 @@ function updateCountryInShoppingCart(country) {
         __RequestVerificationToken: antiForgeryToken(),
         country: country
     };
-    $.post('/shoppingcart/setcountry', postData, function (cart) {
+    $.post('/shoppingcart/setcountry', postData, function (response) {
+        var cart = response.data;
         for (var i = 0; i < cart.Order.OrderDetails.length; i++) {
             var orderDetail = cart.Order.OrderDetails[i];
             refreshDetail(orderDetail);
         }
         recalculate();
     });
+}
+
+function getCountry() {
+    return $('#country-select option:selected').val();
 }

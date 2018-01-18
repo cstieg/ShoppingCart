@@ -18,9 +18,26 @@ namespace Cstieg.Sales.Models
         [Key]
         public int Id { get; set; }
 
-        [StringLength(50, MinimumLength = 4)]
-        [Required]
-        public string CustomerName { get; set; }
+        private string customerName;
+        public string CustomerName
+        {
+            get
+            {
+                if (customerName == null || customerName == "")
+                {
+                    return FirstName + " " + LastName;
+                }
+                return customerName;
+            }
+            set
+            {
+                customerName = value;
+            }
+        }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
 
         public DateTime Registered { get; set; }
 

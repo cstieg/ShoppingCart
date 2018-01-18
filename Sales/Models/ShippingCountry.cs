@@ -13,7 +13,7 @@ namespace Cstieg.Sales.Models
         [ForeignKey("ShippingScheme")]
         public int ShippingSchemeId { get; set; }
         [JsonIgnore]
-        public virtual ShippingScheme ShippingScheme { get; set; }
+        public ShippingScheme ShippingScheme { get; set; }
 
         [ForeignKey("Country")]
         public int CountryId { get; set; }
