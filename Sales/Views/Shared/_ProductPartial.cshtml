@@ -1,0 +1,36 @@
+﻿@model Cstieg.Sales.Models.Product
+
+@{ 
+    string urlName = Model.UrlName ?? Model.Id.ToString();
+}
+
+<article class="col-xs-12 col-sm-4 col-md-3 col-lg-3 product-item" 
+         onmouseover="$(this).addClass('selected');" 
+         onmouseout="$(this).removeClass('selected');">
+    <a href="/Product/@urlName">
+        <div class="image-wrapper">
+            @if (Model.WebImages != null && Model.WebImages.Count() > 0)
+            {
+                <img class="product-image"
+                     src="@Model.WebImages.First().ImageUrl"
+                     srcset="@Model.WebImages.First().ImageSrcSet"
+                     sizes="200px"
+                     alt="@Model.Name image" />
+            }
+            else
+            {
+                <img class="product-image" src="~/Content/images/ImageUnavailable.png" alt="@Model.Name image" />
+            }
+        </div>
+        <h4 class="product-name">@Model.Name</h4>
+    </a>
+    <p class="product-price">$@Model.Price</p>
+    <div class="button-container centered">
+
+        <button class="btn buy-now" onclick="shoppingCart.buyNow(@Model.Id)">Add to Shopping Cart</button>
+        <!--
+    <br />
+    <button class="btn add-to-shopping-cart" onclick="shoppingCart.addToShoppingCart(@Model.Id)">Add to Shopping Cart</button>
+        -->
+    </div>
+</article>

@@ -1,0 +1,44 @@
+﻿@model Cstieg.Sales.Models.Product
+
+<h4>Product</h4>
+<hr />
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Price)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Price)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Shipping)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Shipping)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.DisplayOnFrontPage)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.DisplayOnFrontPage)
+    </dd>
+    <dt>
+        @Html.DisplayNameFor(model => model.DoNotDisplay)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.DoNotDisplay)
+    </dd>
+</dl>

@@ -9,9 +9,9 @@ using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using ________________.Models;
+using ________________________.Models;
 
-namespace _______________.Controllers
+namespace ________________________.Controllers
 {
     public class MailController : BaseController
     {
@@ -33,7 +33,7 @@ namespace _______________.Controllers
             {
                 return HttpNotFound();
             }
-            order.ShipToAddress = await db.Addresses.FindAsync(order.ShipToAddressId);
+            order.ShipToAddress = await db.Addresses.FirstOrDefaultAsync(o => o.Id == order.ShipToAddressId);
 
             // Add baseURL for images to viewBag
             var viewBag = new DynamicViewBag();

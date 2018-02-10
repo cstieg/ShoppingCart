@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Cstieg.Sales.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<button class="pull-right" onclick="editIndex.toggleEditable(this, '/Products/Update');">Edit Values As Table</button>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.WebImages)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Sku)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UrlName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MetaDescription)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Shipping)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DisplayOnFrontPage)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DoNotDisplay)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr model-id="@item.Id">
+        <td field-name="Name" field-type="string">
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @if (item.WebImages != null && item.WebImages.Count > 0)
+        {
+            <img src="@item.WebImages.First().ImageUrl" class="thumbnail" />
+    }
+        </td>
+        <td field-name="Sku" field-type="string">
+            @Html.DisplayFor(modelItem => item.Sku)
+        </td>
+        <td field-name="UrlName" field-type="string">
+            @Html.DisplayFor(modelItem => item.UrlName)
+        </td>
+        <td field-name="MetaDescription" field-type="string">
+            @Html.DisplayFor(modelItem => item.MetaDescription)
+        </td>
+        <td field-name="Price" field-type="decimal">
+            @Html.DisplayFor(modelItem => item.Price)
+        </td>
+        <td field-name="Shipping" field-type="decimal">
+            @Html.DisplayFor(modelItem => item.Shipping)
+        </td>
+        <td field-name="DisplayOnFrontPage" field-type="boolean">
+            @Html.DisplayFor(modelItem => item.DisplayOnFrontPage)
+        </td>
+        <td field-name="DoNotDisplay" field-type="boolean">
+            @Html.DisplayFor(modelItem => item.DoNotDisplay)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+        </td>
+    </tr>
+}
+
+</table>

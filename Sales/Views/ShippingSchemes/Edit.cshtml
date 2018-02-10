@@ -9,7 +9,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>ShippingScheme</h4>
         <hr />
@@ -43,7 +43,7 @@
 <hr />
 <div id="shipping-countries-index" class="sub-index">
     <h3>Shipping Scheme Rules</h3>
-    @{ 
+    @{
         ViewBag.ShippingSchemeId = Model.Id;
     }
     @Html.Partial("_ShippingCountriesIndexPartial", Model.ShippingCountries)

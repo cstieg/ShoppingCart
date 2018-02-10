@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Cstieg.Sales.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    /// <summary>
-    /// Model of an order containing one or more items
-    /// </summary>
-    public class Order
+    public class Order : IOrder
     {
+        [Key]
         public int Id { get; set; }
 
+        [StringLength(30)]
+        [Index]
         public string Cart { get; set; }
 
         public Order()
@@ -26,44 +28,48 @@ namespace Cstieg.Sales.Models
 
         [ForeignKey("ShipToAddress")]
         public int? ShipToAddressId { get; set; }
-        public virtual ShipToAddress ShipToAddress { get; set; }
+        public virtual Address ShipToAddress { get; set; }
 
         [ForeignKey("BillToAddress")]
         public int? BillToAddressId { get; set; }
-        public virtual ShipToAddress BillToAddress { get; set; }
+        public virtual Address BillToAddress { get; set; }
 
         [InverseProperty("Order")]
         public virtual List<OrderDetail> OrderDetails { get; set; }
 
-        public decimal Subtotal {
+        public decimal Subtotal
+        {
             get
             {
                 decimal subtotal = 0;
-                for (int i = 0; i < OrderDetails.Count; i++)
+                foreach(var orderDetail in OrderDetails)
                 {
-                    subtotal += OrderDetails[i].ExtendedPrice;
+                    subtotal += orderDetail.ExtendedPrice;
                 }
                 return subtotal;
             }
         }
-        
-        public decimal Shipping {
+
+        public decimal Shipping
+        {
             get
             {
                 decimal shipping = 0;
-                for (int i = 0; i < OrderDetails.Count; i++)
+                foreach(var orderDetail in OrderDetails)
                 {
-                    shipping += OrderDetails[i].Shipping;
+                    shipping += orderDetail.Shipping;
                 }
                 return shipping;
             }
         }
 
+        public decimal Tax { get; set; }
+
         public decimal Total
         {
             get
             {
-                return Subtotal + Shipping;
+                return Subtotal + Shipping + Tax;
             }
         }
 
@@ -88,16 +94,13 @@ namespace Cstieg.Sales.Models
             }
         }
 
-        /// <summary>
-        /// Sets the shipping amount for each order detail in the order, based upon the country
-        /// </summary>
-        /// <param name="countryCode">The 2 digit ISO country code where the order will be shipped to</param>
-        public void SetShippingByCountry(string countryCode)
+        [StringLength(255)]
+        public string NoteToPayee { get; set; }
+
+        public override string ToString()
         {
-            foreach (var orderDetail in OrderDetails)
-            {
-                orderDetail.SetShippingByCountry(countryCode);
-            }
+            return Description;
         }
+
     }
 }

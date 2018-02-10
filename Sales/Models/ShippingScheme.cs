@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Cstieg.Sales.Interfaces;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class ShippingScheme
+    public class ShippingScheme : IShippingScheme
     {
         [Key]
         public int Id { get; set; }
@@ -17,5 +18,10 @@ namespace Cstieg.Sales.Models
 
         [InverseProperty("ShippingScheme")]
         public virtual List<ShippingCountry> ShippingCountries { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

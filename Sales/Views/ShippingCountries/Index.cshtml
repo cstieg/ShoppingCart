@@ -26,6 +26,15 @@
         <th>
             @Html.DisplayNameFor(model => model.AdditionalShipping)
         </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BaseShippingIsPerItem)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AdditionalShippingIsPerItem)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FreeShipping)
+        </th>
         <th></th>
     </tr>
 
@@ -47,6 +56,15 @@
             @Html.DisplayFor(modelItem => item.AdditionalShipping)
         </td>
         <td>
+            @Html.DisplayFor(modelItem => item.BaseShippingIsPerItem)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AdditionalShippingIsPerItem)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FreeShipping)
+        </td>
+        <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
             @Html.ActionLink("Details", "Details", new { id=item.Id }) |
             @Html.ActionLink("Delete", "Delete", new { id=item.Id })
@@ -55,5 +73,3 @@
 }
 
 </table>
-
-@Html.ActionLink("Back to Edit Menu", "Edit", "Home")

@@ -1,11 +1,11 @@
-﻿using Cstieg.Geography;
+﻿using Cstieg.Sales.Interfaces;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class ShippingCountry
+    public class ShippingCountry : IShippingCountry
     {
         [Key]
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace Cstieg.Sales.Models
         [ForeignKey("ShippingScheme")]
         public int ShippingSchemeId { get; set; }
         [JsonIgnore]
-        public ShippingScheme ShippingScheme { get; set; }
+        public virtual ShippingScheme ShippingScheme { get; set; }
 
         [ForeignKey("Country")]
         public int CountryId { get; set; }
@@ -24,5 +24,20 @@ namespace Cstieg.Sales.Models
         public int? MaxQty { get; set; }
 
         public decimal AdditionalShipping { get; set; }
+
+        public bool BaseShippingIsPerItem { get; set; }
+
+        public bool AdditionalShippingIsPerItem { get; set; }
+
+        public bool FreeShipping { get; set; }
+
+        public override string ToString()
+        {
+            string returnString = Country.ToString();
+            returnString += MinQty != null ? " Min: " + MinQty.ToString() : "";
+            returnString += MaxQty != null ? " Max: " + MaxQty.ToString() : "";
+
+            return returnString;
+        }
     }
 }

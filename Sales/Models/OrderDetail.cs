@@ -1,24 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using Cstieg.Sales.Interfaces;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
-{ 
-    /// <summary>
-    /// A order detail containing a quantity of a given product
-    /// </summary>
-    public class OrderDetail
+{
+    public class OrderDetail : IOrderDetail
     {
         [Key]
         public int Id { get; set; }
 
         [ForeignKey("Product")]
-        [Required]
         public int ProductId { get; set; }
-        public virtual ProductBase Product { get; set; }
+        public virtual Product Product { get; set; }
 
         [Required]
         [Display(Name = "Placed in Cart")]
@@ -33,11 +29,13 @@ namespace Cstieg.Sales.Models
 
         public decimal Shipping { get; set; }
 
+        public decimal Tax { get; set; }
+
         [ForeignKey("Order")]
         [Required]
         public int OrderId { get; set; }
         [JsonIgnore]
-        public Order Order { get; set; }
+        public virtual Order Order { get; set; }
 
         [Display(Name = "Promotional Item")]
         public bool IsPromotionalItem { get; set; }
@@ -57,9 +55,9 @@ namespace Cstieg.Sales.Models
         [Display(Name = "Total Price")]
         public decimal TotalPrice
         {
-            get 
+            get
             {
-                return ExtendedPrice + Shipping;
+                return ExtendedPrice + Shipping + Tax;
             }
         }
 
@@ -67,21 +65,6 @@ namespace Cstieg.Sales.Models
         {
             return Product.ToString() + " Qty " + Quantity.ToString();
         }
-
-        public void SetShippingByCountry(string countryCode)
-        {
-            List<ShippingCountry> shippingCountries = Product.ShippingScheme.ShippingCountries;
-            var shippingCountry = shippingCountries.Find(s => s.Country.IsoCode2 == countryCode
-                               && (s.MinQty == null || Quantity >= s.MinQty)
-                               && (s.MaxQty == null || Quantity <= s.MaxQty));
-            shippingCountry = shippingCountry ?? shippingCountries.Find(s => s.Country.IsoCode2 == "--"
-                                                           && (s.MinQty == null || Quantity >= s.MinQty)
-                                                           && (s.MaxQty == null || Quantity <= s.MaxQty));
-
-            decimal additionalShipping = shippingCountry == null ? 0.0M : shippingCountry.AdditionalShipping;
-            Shipping = Product.Shipping + additionalShipping;
-        }
-
 
     }
 }

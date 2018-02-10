@@ -6,7 +6,7 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Country.Name)
+            @Html.DisplayNameFor(model => model.Country)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.MinQty)
@@ -16,6 +16,15 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.AdditionalShipping)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BaseShippingIsPerItem)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AdditionalShippingIsPerItem)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FreeShipping)
         </th>
         <th></th>
     </tr>
@@ -34,6 +43,15 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AdditionalShipping)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BaseShippingIsPerItem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalShippingIsPerItem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FreeShipping)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", "ShippingCountries", new { id = item.Id }, new { }) |

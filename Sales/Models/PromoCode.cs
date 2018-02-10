@@ -1,13 +1,11 @@
-﻿using System;
+﻿using Cstieg.Sales.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    /// <summary>
-    /// Model of a promotional code authorizing the user to get bonus items or items at discounted prices
-    /// </summary>
-    public class PromoCode
+    public class PromoCode : IPromoCode
     {
         [Key]
         public int Id { get; set; }
@@ -22,9 +20,9 @@ namespace Cstieg.Sales.Models
         public string Description { get; set; }
 
         [ForeignKey("PromotionalItem")]
-        public Nullable<int> PromotionalItemId { get; set; }
+        public int? PromotionalItemId { get; set; }
         [Display(Name = "Promotional Item", Description = "A promotional item that is added to the cart")]
-        public virtual ProductBase PromotionalItem { get; set; }
+        public virtual Product PromotionalItem { get; set; }
 
         [Display(Name = "Promotional Item Price", Description = "The price of the promotional item; may be 0.00")]
         public decimal? PromotionalItemPrice { get; set; }
@@ -32,7 +30,7 @@ namespace Cstieg.Sales.Models
         [ForeignKey("WithPurchaseOf")]
         public int? WithPurchaseOfId { get; set; }
         [Display(Name = "With Purchase Of", Description = "An item that must be purchased to qualify for the promo code")]
-        public virtual ProductBase WithPurchaseOf { get; set; }
+        public virtual Product WithPurchaseOf { get; set; }
 
         [Display(Name = "Minimum Qualifying Purchase", Description = "The minimum purchase amount to qualify for the promo code")]
         public decimal? MinimumQualifyingPurchase { get; set; }
@@ -49,12 +47,17 @@ namespace Cstieg.Sales.Models
         [ForeignKey("SpecialPriceItem")]
         public int? SpecialPriceItemId { get; set; }
         [Display(Name = "Special Price Item", Description = "The item for Percent Off Item or Special Price discount")]
-        public virtual ProductBase SpecialPriceItem { get; set; }
+        public virtual Product SpecialPriceItem { get; set; }
 
         [Display(Name = "Code Start Date")]
         public DateTime? CodeStart { get; set; }
 
         [Display(Name = "Code End Date")]
         public DateTime? CodeEnd { get; set; }
+
+        public override string ToString()
+        {
+            return Code;
+        }
     }
 }

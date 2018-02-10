@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Cstieg.Sales.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    /// <summary>
-    /// Model of a customer
-    /// </summary>
-    public class Customer
+    public class Customer : ICustomer
     {
         public Customer()
         {
-            Addresses = new List<ShipToAddress>();
+            Addresses = new List<IAddress>();
         }
 
         [Key]
@@ -45,15 +43,16 @@ namespace Cstieg.Sales.Models
 
         public int TimesVisited { get; set; }
 
+        [Index(IsUnique = true)]
+        [MaxLength(254)]
         public string EmailAddress { get; set; }
 
         [InverseProperty("Customer")]
-        public virtual ICollection<ShipToAddress> Addresses { get; set; }
+        public virtual ICollection<IAddress> Addresses { get; set; }
 
         public override string ToString()
         {
             return CustomerName;
         }
     }
-
 }

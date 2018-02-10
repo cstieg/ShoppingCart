@@ -50,9 +50,33 @@
             @Html.DisplayFor(model => model.AdditionalShipping)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.BaseShippingIsPerItem)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BaseShippingIsPerItem)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AdditionalShippingIsPerItem)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdditionalShippingIsPerItem)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FreeShipping)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FreeShipping)
+        </dd>
+
     </dl>
 </div>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Edit", "ShippingSchemes", new { id = Model.ShippingSchemeId }, new { })
+    @Html.ActionLink("Back to List", "Index")
 </p>
