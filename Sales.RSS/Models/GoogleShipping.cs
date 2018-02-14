@@ -12,7 +12,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// ISO 3166 country code
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(2)]
         [XmlElement("country")]
         public string Country { get; set; }
@@ -26,7 +26,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Fixed shipping cost, including VAT if required
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [XmlElement("price")]
         public string Price { get; set; }
     }

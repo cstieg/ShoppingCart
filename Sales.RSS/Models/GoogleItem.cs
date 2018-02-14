@@ -16,7 +16,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Your product's unique identifier.  Ex. Sku
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(50)]
         [XmlElement("id")]
         public string Id { get; set; }
@@ -24,7 +24,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Your product's name
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(150)]
         [XmlElement("title")]
         public string Title { get; set; }
@@ -33,7 +33,7 @@ namespace Cstieg.Sales.RSS
         /// Your product's description.  
         /// Don't include ALL CAPS, foreign characters, or promotional text like "free shipping". Just description.
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(5000)]
         [XmlElement("description")]
         public string Description { get; set; }
@@ -41,7 +41,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Your product's landing page
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(2000)]
         [XmlElement("link")]
         public string Link { get; set; }
@@ -49,7 +49,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// The URL of your product's main image
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(2000)]
         [XmlElement("image_link")]
         public string ImageLink { get; set; }
@@ -61,7 +61,7 @@ namespace Cstieg.Sales.RSS
         [StringLength(2000)]
         [XmlElement("additional_image_link")]
         public List<string> AdditionalImageLinks { get; set; }
-        public bool ShouldSerializeAdditionalImageLinks() { return AdditionalImageLinks.Count > 0; }
+        public bool ShouldSerializeAdditionalImageLinks() { return AdditionalImageLinks != null && AdditionalImageLinks.Count > 0; }
 
         /// <summary>
         /// Your product's mobile-optimized landing page when you have a different URL for mobile and desktop traffic
@@ -75,7 +75,7 @@ namespace Cstieg.Sales.RSS
         /// Your product's availability.  Supported values:
         /// "in stock", "out of stock", "preorder"
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [XmlElement("availability")]
         public string Availability { get; set; }
 
@@ -96,7 +96,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Your product's price with the currency. Example: 15.00 USD
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [XmlElement("price")]
         public string Price { get; set; }
 
@@ -135,7 +135,7 @@ namespace Cstieg.Sales.RSS
         /// <summary>
         /// Your product's shipping cost.  Supported prices: 0-1000 USD
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [XmlElement("shipping")]
         public List<GoogleShipping> Shipping { get; set; }
 
@@ -195,7 +195,7 @@ namespace Cstieg.Sales.RSS
         /// Your product's condition.  Supported values:
         /// "new", "refurbished", "used"
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [XmlElement("condition")]
         public string Condition { get; set; }
 
