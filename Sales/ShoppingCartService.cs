@@ -16,9 +16,9 @@ namespace Cstieg.Sales
     /// </summary>
     public partial class ShoppingCartService : IShoppingCartService
     {
-        protected ShoppingCart _shoppingCart;
-        protected string _ownerId;
-        protected ISalesDbContext _context;
+        private ShoppingCart _shoppingCart;
+        private string _ownerId;
+        private ISalesDbContext _context;
 
         /// <summary>
         /// Constructor for ShoppingCartService
@@ -83,7 +83,7 @@ namespace Cstieg.Sales
                 throw new NotFoundException("Product not found in database.  Check id!");
             }
         }
-        
+
         public async Task<OrderDetail> GetOrderDetailAsync(int id)
         {
             return await _context.OrderDetails.FirstAsync(o => o.Id == id);
@@ -276,117 +276,148 @@ namespace Cstieg.Sales
 
         public async Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, ICustomer customer, string cartId)
         {
-            var shoppingCart = await GetShoppingCartAsync();
-            DateTime currentTime = DateTime.Now;
-
-            // Check to see if customer already exists.  If so, update, otherwise create new.
-            var customerInDb = await _context.Customers.FirstOrDefaultAsync(c => c.EmailAddress == customer.EmailAddress);
-            var isNewCustomer = customerInDb == null;
-
-            customerInDb = customerInDb ?? (Customer)customer;
-            if (isNewCustomer)
+            try
             {
+                var shoppingCart = await GetShoppingCartAsync();
+                DateTime currentTime = DateTime.Now;
+
+                // update customer
+                var customerInDb = await CreateOrAddCustomerToContextAsync(customer);
                 customerInDb.Registered = currentTime;
-                _context.Customers.Add(customerInDb);
-            }
-            else
-            {
-                ObjectHelper.CopyProperties(customer, customerInDb, new List<string>() { "Id" });
-                customerInDb.Registered = currentTime;
-                _context.Entry(customerInDb).State = EntityState.Modified;
-            }
-            customerInDb.LastVisited = currentTime;
-            customerInDb.TimesVisited++;
+                customerInDb.LastVisited = currentTime;
+                customerInDb.TimesVisited++;
 
+                // update addresses
+                var addressesForCustomer = await GetAddressesForCustomerInDbAsync(customerInDb);
 
-            // Check to see if addresses already exist.  If so, update, otherwise create new.
-            Address shipToAddressInDb = null;
-            Address billToAddressInDb = null;
-            var addressesForCustomer = new List<Address>();
-            if (!isNewCustomer)
-            {
-                addressesForCustomer = await _context.Addresses.Where(x => x.CustomerId == customerInDb.Id).ToListAsync();
-            }
+                var shipToAddressInDb = CreateOrAddAddressToContext(shipToAddress, addressesForCustomer);
 
-            shipToAddressInDb = addressesForCustomer.Find(x => x.IsSame(shipToAddress));
-            
-            if (shipToAddressInDb == null)
-            {
-                shipToAddressInDb = new Address();
-                ObjectHelper.CopyProperties(shipToAddress, shipToAddressInDb, new List<string>() { "Id" });
-                shipToAddressInDb.Customer = customerInDb;
-                _context.Addresses.Add(shipToAddressInDb);
-            }
-            else
-            {
-                ObjectHelper.CopyProperties(shipToAddress, shipToAddressInDb, new List<string>() { "Id" });
-                _context.Entry(shipToAddressInDb).State = EntityState.Modified;
-            }
-
-            // if billto address is null or same as shipto, set it equal to shipto and save only once in addresses table
-            if (billToAddress == null || billToAddress.IsSame(shipToAddress))
-            {
-                billToAddressInDb = shipToAddressInDb;
-            }
-            else
-            {
-
-                billToAddressInDb = addressesForCustomer.Find(x => x.IsSame(billToAddress));
-                if (billToAddressInDb == null)
+                // if billto address is null or same as shipto, set it equal to shipto and save only once in addresses table
+                Address billToAddressInDb = null;
+                if (billToAddress == null || billToAddress.IsSame(shipToAddress))
                 {
-                    // new billto address that is different from shipto
-                    billToAddressInDb = new Address();
-                    ObjectHelper.CopyProperties(billToAddress, billToAddressInDb, new List<string>() { "Id" });
-                    billToAddressInDb.Customer = customerInDb;
-                    _context.Entry(billToAddressInDb).State = EntityState.Modified;
+                    billToAddressInDb = shipToAddressInDb;
                 }
                 else
                 {
-                    // old shipto address that is different from shipto
-                    ObjectHelper.CopyProperties(billToAddress, billToAddressInDb, new List<string>() { "Id" });
-                    _context.Entry(billToAddressInDb).State = EntityState.Modified;
+                    billToAddressInDb = CreateOrAddAddressToContext(billToAddress, addressesForCustomer);
+                    billToAddressInDb.Customer = customerInDb;
                 }
-            }
 
-            // Set customer name as recipient in address if recipient is empty
-            if (shipToAddressInDb.Recipient.IsEmpty())
-            {
-                shipToAddressInDb.Recipient = customerInDb.CustomerName;
-            }
-            if (billToAddressInDb.Recipient.IsEmpty())
-            {
-                billToAddressInDb.Recipient = customerInDb.CustomerName;
-            }
+                SetAddressRecipientIfEmpty(shipToAddressInDb, customerInDb.CustomerName);
+                SetAddressRecipientIfEmpty(billToAddressInDb, customerInDb.CustomerName);
 
-            // Reference customer in addresses
-            shipToAddressInDb.Customer = customerInDb;
-            billToAddressInDb.Customer = customerInDb;
+                // Reference customer in addresses
+                shipToAddressInDb.Customer = customerInDb;
+                billToAddressInDb.Customer = customerInDb;
 
-            // Reference customer and addresses in order
-            var orderInDb = shoppingCart.Order;
-            orderInDb.Customer = customerInDb;
-            orderInDb.ShipToAddress = shipToAddressInDb;
-            orderInDb.BillToAddress = billToAddressInDb;
+                // Reference customer and addresses in order
+                var orderInDb = shoppingCart.Order;
+                orderInDb.Customer = customerInDb;
+                orderInDb.ShipToAddress = shipToAddressInDb;
+                orderInDb.BillToAddress = billToAddressInDb;
 
-            // Update order time and cart id
-            orderInDb.DateOrdered = currentTime;
-            orderInDb.Cart = cartId;
-            _context.Entry(orderInDb).State = EntityState.Modified;
+                // Update order time and cart id
+                orderInDb.DateOrdered = currentTime;
+                orderInDb.Cart = cartId;
+                _context.Entry(orderInDb).State = EntityState.Modified;
 
-            // Delete shopping cart and clear instance variable
-            _context.ShoppingCarts.Remove(shoppingCart);
+                // Delete shopping cart and clear instance variable
+                _context.ShoppingCarts.Remove(shoppingCart);
 
-
-            try
-            {
                 await _context.SaveChangesAsync();
                 _shoppingCart = shoppingCart = null;
+
+                return orderInDb;
             }
             catch (Exception e)
             {
                 throw new InvalidOrderException(e.Message);
             }
-            return orderInDb;
+        }
+
+        /// <summary>
+        /// Creates or adds customer from payment provider service to the database context.
+        /// </summary>
+        /// <param name="customer">Customer to create or add in database</param>
+        /// <returns>Customer created or added to context</returns>
+        private async Task<Customer> CreateOrAddCustomerToContextAsync(ICustomer customer)
+        {
+            var customerInDb = await _context.Customers.FirstOrDefaultAsync(c => c.EmailAddress == customer.EmailAddress);
+
+            if (IsNewCustomer(customerInDb))
+            {
+                customerInDb = (Customer)customer;
+                _context.Customers.Add(customerInDb);
+            }
+            else
+            {
+                ObjectHelper.CopyProperties(customer, customerInDb, new List<string>() { "Id" });
+                _context.Entry(customerInDb).State = EntityState.Modified;
+            }
+            return customerInDb;
+        }
+
+        /// <summary>
+        /// Creates or add address from payment provider service to the database context
+        /// </summary>
+        /// <param name="address">Address to create or add in database</param>
+        /// <param name="addressesForCustomer">List of addresses for the customer</param>
+        /// <returns>Address created or added to context</returns>
+        private Address CreateOrAddAddressToContext(IAddress address, List<Address> addressesForCustomer)
+        {
+            var addressInDb = addressesForCustomer.Find(x => x.IsSame(address));
+
+            if (addressInDb == null)
+            {
+                addressInDb = new Address();
+                _context.Addresses.Add(addressInDb);
+            }
+            else
+            {
+                _context.Entry(addressInDb).State = EntityState.Modified;
+            }
+            ObjectHelper.CopyProperties(address, addressInDb, new List<string>() { "Id" });
+            return addressInDb;
+        }
+
+        /// <summary>
+        /// Gets the list of addresses for the customer found in the database
+        /// </summary>
+        /// <param name="customer">The customer whose addresses to find</param>
+        /// <returns>A list of the addresses for the customer.  If none, returns empty list.</returns>
+        private async Task<List<Address>> GetAddressesForCustomerInDbAsync(ICustomer customer)
+        {
+            var addressesForCustomer = new List<Address>();
+            if (!IsNewCustomer(customer))
+            {
+                addressesForCustomer = await _context.Addresses.Where(x => x.CustomerId == customer.Id).ToListAsync();
+            }
+            return addressesForCustomer;
+        }
+
+
+        /// <summary>
+        /// Checks whether the customer object is new to the database (not found in query or newly added to context)
+        /// </summary>
+        /// <param name="customer">The customer to check</param>
+        /// <returns>True if is a new customer</returns>
+        private bool IsNewCustomer(ICustomer customer)
+        {
+            return customer == null || _context.Entry(customer).State == EntityState.Added;
+        }
+
+        /// <summary>
+        /// Sets the address recipient field to a value if the recipient field is empty
+        /// </summary>
+        /// <param name="address">The address whose recipient field to set</param>
+        /// <param name="recipient">The value to which the recipient field will be set</param>
+        private void SetAddressRecipientIfEmpty(Address address, string recipient)
+        {
+            if (address.Recipient.IsEmpty())
+            {
+                address.Recipient = recipient;
+            }
         }
 
 
@@ -395,7 +426,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="shoppingCart">The shopping cart to add the Order to</param>
         /// <returns>A reference to the new or existing Order object</returns>
-        protected async Task<Order> AddOrderIfNullAsync(ShoppingCart shoppingCart)
+        private async Task<Order> AddOrderIfNullAsync(ShoppingCart shoppingCart)
         {
             if (shoppingCart.Order == null)
             {
@@ -413,7 +444,7 @@ namespace Cstieg.Sales
         /// Deletes the Order if it is empty, so as not to save null orders to database
         /// </summary>
         /// <param name="shoppingCart">The shopping cart whose null order to delete</param>
-        protected async Task DeleteOrderIfEmptyAsync(ShoppingCart shoppingCart)
+        private async Task DeleteOrderIfEmptyAsync(ShoppingCart shoppingCart)
         {
             if (shoppingCart.Order.OrderDetails.Count == 0)
             {

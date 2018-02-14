@@ -1,9 +1,11 @@
 ﻿using Cstieg.Sales.Interfaces;
 using Cstieg.Sales.Models;
 using Cstieg.Sales.Repositories;
+using Cstieg.Sales.RSS.Exceptions;
 using Cstieg.Sales.RSS.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -61,7 +63,8 @@ namespace Cstieg.Sales.RSS
             // Serialize models to XML
             var serializer = new XmlSerializer(typeof(GoogleFeed));
             var stream = new MemoryStream();
-            serializer.Serialize(stream, await GetGoogleFeedAsync(), namespaces);
+            var feed = await GetGoogleFeedAsync();
+            serializer.Serialize(stream, feed, namespaces);
 
             // Set stream position back to 0, so it will not be at EOS
             stream.Position = 0;
@@ -121,7 +124,7 @@ namespace Cstieg.Sales.RSS
                 Title = product.Name,
                 Description = product.MetaDescription,
                 Link = _baseUrl + "/Product/" + product.UrlName,
-                ImageLink = _baseUrl + product.WebImages.First().ImageUrl,
+                ImageLink = _baseUrl + GetLargestImage(product.WebImages.First()),
                 Availability = "in stock",
                 Price = product.Price.ToString() + " " + _currency,
                 Shipping = new List<GoogleShipping>(),
@@ -139,7 +142,7 @@ namespace Cstieg.Sales.RSS
                 var additionalImageLinks = new List<string>();
                 foreach (var webImage in webImages)
                 {
-                    additionalImageLinks.Add(_baseUrl + webImage.ImageUrl);
+                    additionalImageLinks.Add(_baseUrl + GetLargestImage(webImage));
                 }
                 googleItem.AdditionalImageLinks = additionalImageLinks;
             }
@@ -151,10 +154,7 @@ namespace Cstieg.Sales.RSS
                 googleItem.Shipping.Add(new GoogleShipping()
                 {
                     Country = _country,
-                    Price = (product.Shipping
-                                + product.ShippingScheme.ShippingCountries.Find(s => s.Country.IsoCode2 == _country
-                                && s.MinQty == null || s.MinQty == 1).AdditionalShipping)
-                                .ToString() + " " + _currency
+                    Price = GetShippingPrice(product, _country).ToString() + " " + _currency
                 });
             }
             // add shipping info for other countries in shipping scheme
@@ -168,12 +168,67 @@ namespace Cstieg.Sales.RSS
                     googleItem.Shipping.Add(new GoogleShipping()
                     {
                         Country = shippingCountry.Country.IsoCode2,
-                        Price = (product.Shipping + shippingCountry.AdditionalShipping).ToString() + " " + _currency
+                        Price = GetShippingPrice(product.Shipping, shippingCountry).ToString() + " " + _currency
                     });
                 }
             }
 
+            // validate model
+            var context = new ValidationContext(googleItem);
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(googleItem, context, results))
+            {
+                throw new InvalidModelException("Invalid item");
+            }
+
             return googleItem;
+        }
+
+        /// <summary>
+        /// Gets the shipping price from the shipping scheme for a product given a certain country
+        /// </summary>
+        /// <param name="product">The product model including a shipping scheme</param>
+        /// <param name="_country">The country where the product will be shipped</param>
+        /// <returns>The shipping price for the product to the given country</returns>
+        private decimal GetShippingPrice(IProduct product, string country)
+        {
+            if (product.ShippingScheme != null)
+            {
+                var shippingCountry = product.ShippingScheme.ShippingCountries.Find(s => s.Country.IsoCode2 == country
+                    && s.MinQty == null || s.MinQty == 1);
+                return GetShippingPrice(product.Shipping, shippingCountry);
+            }
+
+            return product.Shipping;
+        }
+
+        /// <summary>
+        /// Gets the shipping price from the shipping country rules and the base shipping price
+        /// </summary>
+        /// <param name="baseShipping">The base shipping price</param>
+        /// <param name="shippingCountry">The model of shipping rules for a country</param>
+        /// <returns></returns>
+        private decimal GetShippingPrice(decimal baseShipping, ShippingCountry shippingCountry)
+        {
+            var shippingPrice = baseShipping;
+            shippingPrice += shippingCountry.AdditionalShipping;
+            if (shippingCountry.FreeShipping)
+            {
+                shippingPrice = 0.00M;
+            }
+            return shippingPrice;
+        }
+
+        /// <summary>
+        /// Gets the URL of the largest image of a WebImage srcset.
+        /// Based on the fact that the WebImage module puts the largest image URL first, and puts a space between the URL and the width
+        /// </summary>
+        /// <param name="webImage">The WebImage object</param>
+        /// <returns>The URL of the largest image</returns>
+        private string GetLargestImage(WebImage webImage)
+        {
+            int firstSpace = webImage.ImageSrcSet.IndexOf(" ");
+            return webImage.ImageSrcSet.Substring(0, firstSpace);
         }
 
     }
