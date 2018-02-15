@@ -10,7 +10,7 @@ namespace Cstieg.Sales.Models
     {
         public Order(DateTime created)
         {
-            Created = Created ?? created;
+            Created = created;
             OrderDetails = OrderDetails ?? new List<OrderDetail>();
         }
 
@@ -30,7 +30,7 @@ namespace Cstieg.Sales.Models
         public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
 
-        public DateTime? Created { get; set; }
+        public DateTime Created { get; set; }
 
         public DateTime? DateOrdered { get; set; }
 
