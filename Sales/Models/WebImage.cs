@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class WebImage : IWebImage
+    public class WebImage : ISalesEntity, IWebImage
     {
         [Key]
         public int Id { get; set; }

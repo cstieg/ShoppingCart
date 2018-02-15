@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class ShippingScheme : IShippingScheme
+    public class ShippingScheme : ISalesEntity
     {
         [Key]
         public int Id { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Cstieg.Sales.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,18 +7,25 @@ using System.Linq;
 
 namespace Cstieg.Sales.Models
 {
-    public class ShoppingCart : IShoppingCart
+    public class ShoppingCart : ISalesEntity
     {
-        /// <summary>
-        /// Constructor that initializes objects to avoid null object errors
-        /// </summary>
         public ShoppingCart()
         {
+            Created = DateTime.Now;
             PromoCodesAdded = new List<PromoCodeAdded>();
+        }
+
+        public static ShoppingCart GetNewShoppingCart()
+        {
+            var shoppingCart = new ShoppingCart();
+            shoppingCart.Order = new Order(shoppingCart.Created);
+            return shoppingCart;
         }
 
         [Key]
         public int Id { get; set; }
+
+        public DateTime Created { get; set; }
 
         // Set by Request.AnonymousId
         [StringLength(36)]
@@ -25,7 +33,7 @@ namespace Cstieg.Sales.Models
         public string OwnerId { get; set; }
 
         [ForeignKey("Order")]
-        public int? OrderId { get; set; }
+        public int OrderId { get; set; }
         public virtual Order Order { get; set; }
 
         public string Country { get; set; }
@@ -68,6 +76,11 @@ namespace Cstieg.Sales.Models
 
         [NotMapped]
         public bool NeedsRefresh { get; set; }
+
+        public bool IsEmpty()
+        {
+            return GetOrderDetails().Count == 0;
+        }
 
         public override string ToString()
         {

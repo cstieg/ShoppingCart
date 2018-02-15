@@ -1,4 +1,5 @@
-﻿using Cstieg.Sales.Models;
+﻿using Cstieg.Sales.Interfaces;
+using Cstieg.Sales.Models;
 using System.Data.Entity;
 using System.Threading.Tasks;
 

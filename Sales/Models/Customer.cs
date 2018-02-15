@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class Customer : ICustomer
+    public class Customer : ISalesEntity
     {
         public Customer()
         {

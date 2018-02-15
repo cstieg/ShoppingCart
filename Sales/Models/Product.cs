@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace Cstieg.Sales.Models
 {
-    public class Product : IProduct
+    public class Product : ISalesEntity
     {
         [Key]
         public virtual int Id { get; set; }

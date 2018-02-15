@@ -1,9 +1,8 @@
-﻿using Cstieg.Sales.Interfaces;
-using Cstieg.Sales.Models;
+﻿using Cstieg.Sales.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Cstieg.Sales
+namespace Cstieg.Sales.Interfaces
 {
     /// <summary>
     /// Interface for shopping cart service
@@ -17,12 +16,6 @@ namespace Cstieg.Sales
         Task<ShoppingCart> GetShoppingCartAsync();
 
         /// <summary>
-        /// Gets the order details from the shopping cart, or from the instance variable if it already exists
-        /// </summary>
-        /// <returns>A list of the order details from the shopping cart</returns>
-        Task<List<OrderDetail>> GetOrderDetailsAsync();
-
-        /// <summary>
         /// Gets an order detail from database by id
         /// </summary>
         /// <param name="id">The id of the order detail to get</param>
@@ -34,7 +27,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="product">The product which is contained in the order detail</param>
         /// <returns>The order detail</returns>
-        Task<OrderDetail> GetOrderDetailAsync(IProduct product);
+        Task<OrderDetail> GetOrderDetailAsync(Product product);
 
         /// <summary>
         /// Gets a product from the database by id
@@ -48,7 +41,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="product">The product to add to the shopping cart</param>
         /// <returns>The order detail added</returns>
-        Task<OrderDetail> AddProductAsync(IProduct product);
+        Task<OrderDetail> AddProductAsync(Product product);
         Task<OrderDetail> AddProductAsync(int productId);
 
         /// <summary>
@@ -56,21 +49,20 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="product">The product to remove from the shopping cart</param>
         /// <param name="saveChanges">Whether to save changes to the database.  Default: true</param>
-        /// <param name="update">Whether to update promocodes.  Default: true.  Should be false when removing promotional product.</param>
-        Task RemoveProductAsync(IProduct product, bool saveChanges, bool update);
-        Task RemoveProductAsync(int productId, bool saveChanges, bool update);
+        Task RemoveProductAsync(Product product, bool saveChanges);
+        Task RemoveProductAsync(int productId, bool saveChanges);
 
         /// <summary>
         /// Clears all order details from the shopping cart
         /// </summary>
-        Task ClearShoppingCartAsync();
+        Task DeleteShoppingCartAsync();
 
         /// <summary>
         /// Increases the quantity of a product in the shopping cart by 1
         /// </summary>
         /// <param name="product">The product to increment</param>
         /// <returns>The incremented order detail</returns>
-        Task<OrderDetail> IncrementProductAsync(IProduct product);
+        Task<OrderDetail> IncrementProductAsync(Product product);
         Task<OrderDetail> IncrementProductAsync(int productId);
 
         /// <summary>
@@ -78,7 +70,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="product">The product to decrement</param>
         /// <returns>The decremented order detail</returns>
-        Task<OrderDetail> DecrementProductAsync(IProduct product);
+        Task<OrderDetail> DecrementProductAsync(Product product);
         Task<OrderDetail> DecrementProductAsync(int productId);
 
         
@@ -124,7 +116,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="promoCode">The code object to add</param>
         /// <returns>The shopping cart with the promocode added</returns>>
-        Task<ShoppingCart> AddPromoCodeAsync(IPromoCode promoCode);
+        Task<ShoppingCart> AddPromoCodeAsync(PromoCode promoCode);
 
         /// <summary>
         /// Removes all promocodes added from database and shopping cart
@@ -167,6 +159,6 @@ namespace Cstieg.Sales
         /// <param name="customer">The customer object containing customer name and email received from the user at checkout</param>
         /// <param name="cartId">The shopping cart id for the order received from the payment processor</param>
         /// <returns>The updated and saved order object</returns>
-        Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, ICustomer customer, string cartId);
+        Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, Customer customer, string cartId);
     }
 }

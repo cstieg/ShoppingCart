@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Interfaces
 {
-    public interface IWebImage : ISalesEntity
+    public interface IWebImage
     {
         string ImageUrl { get; set; }
 

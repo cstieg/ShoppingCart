@@ -1,5 +1,4 @@
-﻿using Cstieg.Sales.Interfaces;
-using Cstieg.Sales.Models;
+﻿using Cstieg.Sales.Models;
 using Cstieg.Sales.Repositories;
 using Cstieg.Sales.RSS.Exceptions;
 using Cstieg.Sales.RSS.Models;
@@ -116,7 +115,7 @@ namespace Cstieg.Sales.RSS
         /// </summary>
         /// <param name="product">A product from the website store</param>
         /// <returns>The GoogleItem model containing the product info</returns>
-        public GoogleItem GetGoogleItem(IProduct product)
+        public GoogleItem GetGoogleItem(Product product)
         {
             var googleItem = new GoogleItem()
             {
@@ -190,7 +189,7 @@ namespace Cstieg.Sales.RSS
         /// <param name="product">The product model including a shipping scheme</param>
         /// <param name="_country">The country where the product will be shipped</param>
         /// <returns>The shipping price for the product to the given country</returns>
-        private decimal GetShippingPrice(IProduct product, string country)
+        private decimal GetShippingPrice(Product product, string country)
         {
             if (product.ShippingScheme != null)
             {

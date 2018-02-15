@@ -1,7 +1,7 @@
 ﻿namespace Cstieg.Sales.Interfaces
 {
-    public interface ISalesEntity : IEntity
+    public interface ISalesEntity
     {
-
+        int Id { get; set; }
     }
 }

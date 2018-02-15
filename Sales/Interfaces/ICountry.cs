@@ -1,6 +1,6 @@
 ﻿namespace Cstieg.Sales.Interfaces
 {
-    public interface ICountry : ISalesEntity
+    public interface ICountry
     {
         string Name { get; set; }
 

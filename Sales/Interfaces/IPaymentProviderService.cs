@@ -1,10 +1,10 @@
-﻿using Cstieg.Sales.Interfaces;
+﻿using Cstieg.Sales.Models;
 
-namespace Cstieg.Sales
+namespace Cstieg.Sales.Interfaces
 {
     public interface IPaymentProviderService
     {
-        ICustomer GetCustomer();
+        Customer GetCustomer();
 
         IAddress GetShippingAddress();
 
@@ -12,7 +12,7 @@ namespace Cstieg.Sales
 
         string GetCountryCode();
 
-        IOrder GetOrder();
+        Order GetOrder();
 
         string GetCartId();
     }

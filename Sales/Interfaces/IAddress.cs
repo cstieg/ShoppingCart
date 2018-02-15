@@ -1,6 +1,6 @@
 ﻿namespace Cstieg.Sales.Interfaces
 {
-    public interface IAddress : ISalesEntity
+    public interface IAddress
     {
         string Address1 { get; set; }
 

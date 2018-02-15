@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class Country : ICountry
+    public class Country : ISalesEntity, ICountry
     {
         [Key]
         public int Id { get; set; }

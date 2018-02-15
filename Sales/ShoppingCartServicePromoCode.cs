@@ -51,7 +51,7 @@ namespace Cstieg.Sales
             // remove product added by promocode
             if (promoCode.PromotionalItem != null)
             {
-                await RemoveProductAsync(promoCode.PromotionalItem.Id, false, false);
+                await RemoveProductAsync(promoCode.PromotionalItem.Id, false);
             }
 
             shoppingCart.PromoCodesAdded.Remove(promoCodeAdded);
@@ -114,7 +114,7 @@ namespace Cstieg.Sales
             return await AddPromoCodeAsync(promoCode);
         }
 
-        public async Task<ShoppingCart> AddPromoCodeAsync(IPromoCode promoCode)
+        public async Task<ShoppingCart> AddPromoCodeAsync(PromoCode promoCode)
         {
             if (promoCode == null)
             {
@@ -178,7 +178,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="shoppingCart">The shopping cart to which to add the promo code</param>
         /// <param name="promoCode">The promo code object to add</param>
-        private void AddPromotionalItem(IShoppingCart shoppingCart, IPromoCode promoCode)
+        private void AddPromotionalItem(ShoppingCart shoppingCart, PromoCode promoCode)
         {
             if (promoCode.PromotionalItem != null)
             {
@@ -203,7 +203,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="shoppingCart">The shopping cart to which to add the promo code</param>
         /// <param name="promoCode">The promo code object to add</param>
-        private void ApplySpecialPrice(IShoppingCart shoppingCart, IPromoCode promoCode)
+        private void ApplySpecialPrice(ShoppingCart shoppingCart, PromoCode promoCode)
         {
             if (promoCode.SpecialPriceItem != null && promoCode.SpecialPrice != null)
             {
@@ -221,7 +221,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="shoppingCart">The shopping cart to which to add the promo code</param>
         /// <param name="promoCode">The promo code object to add</param>
-        private void ApplyPercentOffItem(IShoppingCart shoppingCart, IPromoCode promoCode)
+        private void ApplyPercentOffItem(ShoppingCart shoppingCart, PromoCode promoCode)
         {
             if (promoCode.PercentOffItem != null && promoCode.PercentOffItem > 0 && promoCode.SpecialPriceItem != null)
             {
@@ -237,7 +237,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="shoppingCart">The shopping cart to which to add the promo code</param>
         /// <param name="promoCode">The promo code object to add</param>
-        private void ApplyPercentOffOrder(IShoppingCart shoppingCart, IPromoCode promoCode)
+        private void ApplyPercentOffOrder(ShoppingCart shoppingCart, PromoCode promoCode)
         {
             if (promoCode.PercentOffOrder != null && promoCode.PercentOffOrder > 0)
             {

@@ -6,8 +6,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class Order : IOrder
+    public class Order : ISalesEntity
     {
+        public Order(DateTime created)
+        {
+            Created = Created ?? created;
+            OrderDetails = OrderDetails ?? new List<OrderDetail>();
+        }
+
+        public Order()
+        {
+            OrderDetails = OrderDetails ?? new List<OrderDetail>();
+        }
+
         [Key]
         public int Id { get; set; }
 
@@ -15,14 +26,11 @@ namespace Cstieg.Sales.Models
         [Index]
         public string Cart { get; set; }
 
-        public Order()
-        {
-            OrderDetails = new List<OrderDetail>();
-        }
-
         [ForeignKey("Customer")]
         public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
+
+        public DateTime? Created { get; set; }
 
         public DateTime? DateOrdered { get; set; }
 

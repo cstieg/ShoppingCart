@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cstieg.Sales.Models
 {
-    public class Address : IAddress
+    public class Address : ISalesEntity, IAddress
     {
         [Key]
         public virtual int Id { get; set; }
