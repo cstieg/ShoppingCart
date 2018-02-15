@@ -31,6 +31,7 @@ namespace Cstieg.Sales
             _context = context;
         }
 
+
         public async Task<ShoppingCart> GetShoppingCartAsync()
         {
             // Don't make another database call if a populated shopping cart object is in the service instance
@@ -40,7 +41,7 @@ namespace Cstieg.Sales
             }
 
             // Get the shopping cart object from the repository including order and order details
-            _shoppingCart = await _context.ShoppingCarts.Include(o => o.Order).Include(o => o.Order.OrderDetails).Include(o => o.Order.OrderDetails)
+            _shoppingCart = await _context.ShoppingCarts.Include(o => o.Order).Include(o => o.Order.OrderDetails)
                 .Include(o => o.Order.OrderDetails.Select(p => p.Product))
                 .Include(o => o.Order.OrderDetails.Select(p => p.Product.ShippingScheme))
                 .Include(o => o.Order.OrderDetails.Select(p => p.Product.ShippingScheme.ShippingCountries))
@@ -48,30 +49,14 @@ namespace Cstieg.Sales
                 .Include(o => o.PromoCodesAdded).Include(o => o.PromoCodesAdded.Select(p => p.PromoCode))
                 .FirstOrDefaultAsync(s => s.OwnerId == _ownerId);
 
-            // Return newly saved shopping cart if not already existing in repository
-            if (_shoppingCart == null)
-            {
-                _shoppingCart = new ShoppingCart
-                {
-                    OwnerId = _ownerId
-                };
-                _context.ShoppingCarts.Add(_shoppingCart);
-                await _context.SaveChangesAsync();
-            }
+            _shoppingCart = _shoppingCart ?? ShoppingCart.GetNewShoppingCart();
+
+            _shoppingCart.OwnerId = _ownerId;
 
             return _shoppingCart;
         }
 
-        public async Task<List<OrderDetail>> GetOrderDetailsAsync()
-        {
-            var shoppingCart = await GetShoppingCartAsync();
-            if (shoppingCart.Order == null)
-            {
-                return new List<OrderDetail>();
-            }
-            return shoppingCart.Order.OrderDetails;
-        }
-
+        
         public async Task<Product> GetProductAsync(int id)
         {
             try
@@ -84,12 +69,13 @@ namespace Cstieg.Sales
             }
         }
 
+
         public async Task<OrderDetail> GetOrderDetailAsync(int id)
         {
             return await _context.OrderDetails.FirstAsync(o => o.Id == id);
         }
 
-        public async Task<OrderDetail> GetOrderDetailAsync(IProduct product)
+        public async Task<OrderDetail> GetOrderDetailAsync(Product product)
         {
             var shoppingCart = await GetShoppingCartAsync();
             if (shoppingCart.Order == null)
@@ -99,10 +85,16 @@ namespace Cstieg.Sales
             return shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
         }
 
-        public async Task<OrderDetail> AddProductAsync(IProduct product)
+
+        public async Task<OrderDetail> AddProductAsync(int productId)
+        {
+            var product = await GetProductAsync(productId);
+            return await AddProductAsync(product);
+        }
+
+        public async Task<OrderDetail> AddProductAsync(Product product)
         {
             ShoppingCart shoppingCart = await GetShoppingCartAsync();
-            await AddOrderIfNullAsync(shoppingCart);
 
             if (shoppingCart.GetOrderDetails().Any(o => o.ProductId == product.Id))
             {
@@ -111,76 +103,66 @@ namespace Cstieg.Sales
 
             var orderDetail = new OrderDetail()
             {
-                OrderId = shoppingCart.Order.Id,
-                Product = (Product)product,
+                Order = shoppingCart.Order,
+                Product = product,
                 ProductId = product.Id,
                 PlacedInCart = DateTime.Now,
                 Quantity = 1,
                 Shipping = product.Shipping,
                 UnitPrice = product.Price
             };
+            shoppingCart.GetOrderDetails().Add(orderDetail);
+
             _context.OrderDetails.Add(orderDetail);
+            _context.Upsert(shoppingCart);
+            _context.Upsert(shoppingCart.Order);
             await _context.SaveChangesAsync();
 
             return orderDetail;
         }
 
-        public async Task<OrderDetail> AddProductAsync(int productId)
+
+        public async Task RemoveProductAsync(int productId, bool saveChanges = true)
         {
             var product = await GetProductAsync(productId);
-            return await AddProductAsync(product);
+            await RemoveProductAsync(product, saveChanges);
         }
 
-        public async Task RemoveProductAsync(IProduct product, bool saveChanges = true, bool update = true)
+        public async Task RemoveProductAsync(Product product, bool saveChanges = true)
         {
             var shoppingCart = await GetShoppingCartAsync();
-            var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
-            shoppingCart.Order.OrderDetails.Remove(orderDetail);
+            var orderDetail = shoppingCart.GetOrderDetails().Find(o => o.ProductId == product.Id);
+            shoppingCart.GetOrderDetails().Remove(orderDetail);
 
             _context.OrderDetails.Remove(orderDetail);
 
-            if (update)
-            {
-                await UpdatePromoCodesAsync(false);
-                await DeleteOrderIfEmptyAsync(shoppingCart);
-            }
             if (saveChanges)
             {
+                // UpdatePromoCodes must be only be called when saving changes, or else there will be a cycle
+                await UpdatePromoCodesAsync(false);
+                if (shoppingCart.IsEmpty())
+                {
+                    await DeleteShoppingCartAsync();
+                    return;
+                }
                 await _context.SaveChangesAsync();
             }
-
         }
 
-        public async Task RemoveProductAsync(int productId, bool saveChanges = true, bool update = true)
-        {
-            var product = await GetProductAsync(productId);
-            await RemoveProductAsync(product, saveChanges, update);
-        }
 
-        public async Task ClearShoppingCartAsync()
+        public async Task DeleteShoppingCartAsync()
         {
             var shoppingCart = await GetShoppingCartAsync();
             await RemoveAllPromoCodesAsync(false);
-            foreach (var orderDetail in shoppingCart.Order.OrderDetails.ToArray())
+            foreach (var orderDetail in shoppingCart.GetOrderDetails().ToArray())
             {
                 _context.OrderDetails.Remove(orderDetail);
             }
             _context.Orders.Remove(shoppingCart.Order);
+            _context.ShoppingCarts.Remove(shoppingCart);
             await _context.SaveChangesAsync();
-
-            shoppingCart.Order = null;
-            shoppingCart.OrderId = null;
         }
 
-        public async Task<OrderDetail> IncrementProductAsync(IProduct product)
-        {
-            var shoppingCart = await GetShoppingCartAsync();
-            var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
-            orderDetail.Quantity++;
-            _context.Entry(orderDetail).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return orderDetail;
-        }
 
         public async Task<OrderDetail> IncrementProductAsync(int productId)
         {
@@ -188,22 +170,39 @@ namespace Cstieg.Sales
             return await IncrementProductAsync(product);
         }
 
-        public async Task<OrderDetail> DecrementProductAsync(IProduct product)
+        public async Task<OrderDetail> IncrementProductAsync(Product product)
         {
             var shoppingCart = await GetShoppingCartAsync();
             var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
-            orderDetail.Quantity--;
+
+            orderDetail.Quantity++;
+
             _context.Entry(orderDetail).State = EntityState.Modified;
-            await UpdatePromoCodesAsync();
             await _context.SaveChangesAsync();
             return orderDetail;
         }
+
 
         public async Task<OrderDetail> DecrementProductAsync(int productId)
         {
             var product = await GetProductAsync(productId);
             return await DecrementProductAsync(product);
         }
+
+        public async Task<OrderDetail> DecrementProductAsync(Product product)
+        {
+            var shoppingCart = await GetShoppingCartAsync();
+            var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
+
+            orderDetail.Quantity--;
+
+            await UpdatePromoCodesAsync();
+
+            _context.Entry(orderDetail).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return orderDetail;
+        }
+
 
         private async Task<ShoppingCart> ResetPricesAsync(bool saveInDb = true)
         {
@@ -222,6 +221,7 @@ namespace Cstieg.Sales
             return shoppingCart;
         }
 
+
         public async Task<ShoppingCart> SetCountryAsync(string countryCode)
         {
             var shoppingCart = await GetShoppingCartAsync();
@@ -230,10 +230,11 @@ namespace Cstieg.Sales
             return shoppingCart;
         }
 
+
         public async Task VerifyOrderDetailsAsync(List<OrderDetail> orderDetails, decimal total)
         {
             var shoppingCart = await GetShoppingCartAsync();
-            if (orderDetails.Count != shoppingCart.Order.OrderDetails.Count)
+            if (orderDetails.Count != shoppingCart.GetOrderDetails().Count)
             {
                 throw new InvalidOrderException("Your shopping cart has been changed! Please try again.");
             }
@@ -251,6 +252,7 @@ namespace Cstieg.Sales
                 }
             }
         }
+
 
         public async Task VerifyCountryAsync(string countryCode)
         {
@@ -274,7 +276,8 @@ namespace Cstieg.Sales
             }
         }
 
-        public async Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, ICustomer customer, string cartId)
+
+        public async Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, Customer customer, string cartId)
         {
             try
             {
@@ -336,18 +339,19 @@ namespace Cstieg.Sales
             }
         }
 
+
         /// <summary>
         /// Creates or adds customer from payment provider service to the database context.
         /// </summary>
         /// <param name="customer">Customer to create or add in database</param>
         /// <returns>Customer created or added to context</returns>
-        private async Task<Customer> CreateOrAddCustomerToContextAsync(ICustomer customer)
+        private async Task<Customer> CreateOrAddCustomerToContextAsync(Customer customer)
         {
             var customerInDb = await _context.Customers.FirstOrDefaultAsync(c => c.EmailAddress == customer.EmailAddress);
 
             if (IsNewCustomer(customerInDb))
             {
-                customerInDb = (Customer)customer;
+                customerInDb = customer;
                 _context.Customers.Add(customerInDb);
             }
             else
@@ -386,7 +390,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="customer">The customer whose addresses to find</param>
         /// <returns>A list of the addresses for the customer.  If none, returns empty list.</returns>
-        private async Task<List<Address>> GetAddressesForCustomerInDbAsync(ICustomer customer)
+        private async Task<List<Address>> GetAddressesForCustomerInDbAsync(Customer customer)
         {
             var addressesForCustomer = new List<Address>();
             if (!IsNewCustomer(customer))
@@ -402,7 +406,7 @@ namespace Cstieg.Sales
         /// </summary>
         /// <param name="customer">The customer to check</param>
         /// <returns>True if is a new customer</returns>
-        private bool IsNewCustomer(ICustomer customer)
+        private bool IsNewCustomer(Customer customer)
         {
             return customer == null || _context.Entry(customer).State == EntityState.Added;
         }
@@ -420,37 +424,6 @@ namespace Cstieg.Sales
             }
         }
 
-
-        /// <summary>
-        /// Adds an Order object to the shopping cart if the Order property in the shopping cart is null
-        /// </summary>
-        /// <param name="shoppingCart">The shopping cart to add the Order to</param>
-        /// <returns>A reference to the new or existing Order object</returns>
-        private async Task<Order> AddOrderIfNullAsync(ShoppingCart shoppingCart)
-        {
-            if (shoppingCart.Order == null)
-            {
-                shoppingCart.Order = new Order
-                {
-                    OrderDetails = new List<OrderDetail>()
-                };
-                _context.Orders.Add(shoppingCart.Order);
-                await _context.SaveChangesAsync();
-            }
-            return shoppingCart.Order;
-        }
-
-        /// <summary>
-        /// Deletes the Order if it is empty, so as not to save null orders to database
-        /// </summary>
-        /// <param name="shoppingCart">The shopping cart whose null order to delete</param>
-        private async Task DeleteOrderIfEmptyAsync(ShoppingCart shoppingCart)
-        {
-            if (shoppingCart.Order.OrderDetails.Count == 0)
-            {
-                await ClearShoppingCartAsync();
-            }
-        }
 
     }
 }
