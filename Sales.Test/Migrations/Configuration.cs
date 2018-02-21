@@ -1,4 +1,4 @@
-namespace Cstieg.Sales.Migrations
+namespace Cstieg.Sales.Test.Migrations
 {
     using System.Data.Entity.Migrations;
 
@@ -7,6 +7,7 @@ namespace Cstieg.Sales.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            ContextKey = "Sales.Test";
         }
 
         protected override void Seed(Cstieg.Sales.Repositories.SalesContext context)
