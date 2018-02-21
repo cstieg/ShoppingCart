@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Threading.Tasks;
 using Cstieg.Sales.Exceptions;
-using Cstieg.Sales.Interfaces;
 using Cstieg.Sales.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -81,8 +80,8 @@ namespace Cstieg.Sales.Test
             promotionalItemWithPurchaseOf.PromotionalItem = bonusProduct;
             promotionalItemWithPurchaseOf.WithPurchaseOf = sampleProduct;
             promotionalItemMinimumQualifyingPurchase.PromotionalItem = bonusProduct;
-            percentOffItem.SpecialPriceItem = sampleProduct2;
-            specialPriceItem.SpecialPriceItem = sampleProduct2;
+            percentOffItem.SpecialPriceItem = SampleProduct2;
+            specialPriceItem.SpecialPriceItem = SampleProduct2;
         }
 
         [TestMethod]
@@ -94,6 +93,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -119,7 +119,7 @@ namespace Cstieg.Sales.Test
                 o.Product.Name == "Bonus Item" && o.UnitPrice == 0.10M && o.Quantity == 1),
                 "Must be 1 promotional item added.");
             Assert.AreEqual(1.11M, shoppingCart.GrandTotal, "Incorrect total.");
-            Assert.AreEqual(1, shoppingCart.PromoCodes.FindAll(p => p.Code == "PIWPO").Count, "Must be 1 promocode in shoppingCart.");
+            Assert.AreEqual(1, shoppingCart.PromoCodesAdded.FindAll(p => p.PromoCode.Code == "PIWPO").Count, "Must be 1 promocode in shoppingCart.");
         }
 
         [TestMethod]
@@ -132,17 +132,18 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 1,
-                UnitPrice = sampleProduct2.Price,
-                Shipping = sampleProduct2.Shipping
+                UnitPrice = SampleProduct2.Price,
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
             context.PromoCodes.Add(promotionalItemWithPurchaseOf);
@@ -163,17 +164,18 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 1,
-                UnitPrice = sampleProduct2.Price,
-                Shipping = sampleProduct2.Shipping
+                UnitPrice = SampleProduct2.Price,
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
             context.PromoCodes.Add(promotionalItemMinimumQualifyingPurchase);
@@ -188,7 +190,7 @@ namespace Cstieg.Sales.Test
                 o.Product.Name == "Bonus Item" && o.UnitPrice == 0M && o.Quantity == 1),
                 "Must be 1 promotional item added.");
             Assert.AreEqual(133.23M, shoppingCart.GrandTotal, "Incorrect total.");
-            Assert.AreEqual(1, shoppingCart.PromoCodes.FindAll(p => p.Code == "PIMQP").Count, "Must be 1 promocode in shoppingCart.");
+            Assert.AreEqual(1, shoppingCart.PromoCodesAdded.FindAll(p => p.PromoCode.Code == "PIMQP").Count, "Must be 1 promocode in shoppingCart.");
         }
 
         [TestMethod]
@@ -201,6 +203,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -232,6 +235,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -247,11 +251,11 @@ namespace Cstieg.Sales.Test
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
-                UnitPrice = sampleProduct2.Price,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
+                UnitPrice = SampleProduct2.Price,
                 Quantity = 1,
-                Shipping = sampleProduct2.Shipping
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
             context.PromoCodes.Add(percentOffOrder);
@@ -263,7 +267,7 @@ namespace Cstieg.Sales.Test
             // Assert
             Assert.IsNotNull(shoppingCart, "ShoppingCart is null.");
             Assert.AreEqual(69.74M, shoppingCart.GrandTotal, "Incorrect total.");
-            Assert.AreEqual(1, shoppingCart.PromoCodes.FindAll(p => p.Code == "POO").Count, "Must be 1 promocode in shoppingCart.");
+            Assert.AreEqual(1, shoppingCart.PromoCodesAdded.FindAll(p => p.PromoCode.Code == "POO").Count, "Must be 1 promocode in shoppingCart.");
         }
 
         [TestMethod]
@@ -275,20 +279,21 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
-                UnitPrice = sampleProduct2.Price,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
+                UnitPrice = SampleProduct2.Price,
                 Quantity = 2,
-                Shipping = sampleProduct2.Shipping
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
-            context.Products.Add(sampleProduct2);
+            context.Products.Add(SampleProduct2);
             context.PromoCodes.Add(percentOffItem);
             await context.SaveChangesAsync();
 
@@ -298,7 +303,7 @@ namespace Cstieg.Sales.Test
             // Assert
             Assert.IsNotNull(shoppingCart, "ShoppingCart is null.");
             Assert.AreEqual(197.73M, shoppingCart.GrandTotal, "Incorrect total.");
-            Assert.AreEqual(1, shoppingCart.PromoCodes.FindAll(p => p.Code == "POI").Count, "Must be 1 promocode in shoppingCart.");
+            Assert.AreEqual(1, shoppingCart.PromoCodesAdded.FindAll(p => p.PromoCode.Code == "POI").Count, "Must be 1 promocode in shoppingCart.");
         }
 
 
@@ -311,19 +316,20 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
+                Product = SampleProduct2,
                 Quantity = 2,
-                UnitPrice = sampleProduct2.Price,
-                Shipping = sampleProduct2.Shipping
+                UnitPrice = SampleProduct2.Price,
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
-            context.Products.Add(sampleProduct2);
+            context.Products.Add(SampleProduct2);
             context.PromoCodes.Add(specialPriceItem);
             await context.SaveChangesAsync();
 
@@ -333,7 +339,7 @@ namespace Cstieg.Sales.Test
             // Assert
             Assert.IsNotNull(shoppingCart, "ShoppingCart is null.");
             Assert.AreEqual(5.23M, shoppingCart.GrandTotal, "Incorrect total.");
-            Assert.AreEqual(1, shoppingCart.PromoCodes.FindAll(p => p.Code == "SPI").Count, "Must be 1 promocode in shoppingCart.");
+            Assert.AreEqual(1, shoppingCart.PromoCodesAdded.FindAll(p => p.PromoCode.Code == "SPI").Count, "Must be 1 promocode in shoppingCart.");
         }
 
         [TestMethod]
@@ -346,20 +352,21 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 1,
-                UnitPrice = sampleProduct2.Price,
-                Shipping = sampleProduct2.Shipping
+                UnitPrice = SampleProduct2.Price,
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
-            context.Products.Add(sampleProduct2);
+            context.Products.Add(SampleProduct2);
             context.PromoCodes.Add(notAvailableYetPromo);
             await context.SaveChangesAsync();
 
@@ -380,20 +387,21 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
             mockShoppingCart.Order.OrderDetails.Add(new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 1,
-                UnitPrice = sampleProduct2.Price,
-                Shipping = sampleProduct2.Shipping
+                UnitPrice = SampleProduct2.Price,
+                Shipping = SampleProduct2.Shipping
             });
             context.ShoppingCarts.Add(mockShoppingCart);
-            context.Products.Add(sampleProduct2);
+            context.Products.Add(SampleProduct2);
             context.PromoCodes.Add(expiredPromoCode);
             await context.SaveChangesAsync();
 

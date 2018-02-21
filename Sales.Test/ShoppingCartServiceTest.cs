@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using Cstieg.Sales.Exceptions;
 using Cstieg.Sales.Models;
 using Cstieg.Sales.Repositories;
@@ -14,9 +14,8 @@ namespace Cstieg.Sales.Test
     [TestClass]
     public partial class ShoppingCartServiceTest
     {
-        SqlConnection connection;
-        SalesContext context;
-        DbContextTransaction transaction;
+        private SalesContext context;
+        private TransactionScope _transactionScope;
         string ownerId = "abcdefgh12345";
         ShoppingCartService shoppingCartService;
 
@@ -35,36 +34,30 @@ namespace Cstieg.Sales.Test
             Shipping = 4.23M
         };
 
+        public Product SampleProduct2 { get => sampleProduct2; set => sampleProduct2 = value; }
+
         [TestInitialize]
         public void Initialize()
         {
             InitializeShippingScheme();
             InitializePromoCode();
 
-            try
-            {
-                connection = LocalDb.GetLocalDb("SalesTest", true);
-            }
-            catch
-            {
-                connection = LocalDb.GetLocalDb("SalesTest");
-            }
 
-            context = new SalesContext(connection, true);
-            transaction = context.Database.BeginTransaction();
+            context = new SalesContext();
+            _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            var fakeProducts = new List<Product>() { sampleProduct, SampleProduct2 };
+            context.Products.AddRange(fakeProducts);
+            context.SaveChanges();
+
             shoppingCartService = new ShoppingCartService(context, ownerId);
         }
 
         [TestCleanup]
-        public void CloseData()
+        public void Cleanup()
         {
-            transaction.Rollback();
-            transaction.Dispose();
-            context.Dispose();
-            context = null;
-            connection.Close();
-            connection.Dispose();
-            connection = null;
+            Transaction.Current.Rollback();
+            _transactionScope.Dispose();
         }
 
         [TestMethod]
@@ -76,6 +69,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -121,6 +115,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -151,13 +146,12 @@ namespace Cstieg.Sales.Test
             var orderDetail = await shoppingCartService.AddProductAsync(sampleProduct);
 
             // Act
-            await shoppingCartService.ClearShoppingCartAsync();
+            await shoppingCartService.DeleteShoppingCartAsync();
 
             // Assert
-            var shoppingCart = await context.ShoppingCarts.Where(x => x.OwnerId == ownerId).FirstOrDefaultAsync();
-            Assert.IsFalse(await context.OrderDetails.AnyAsync(x => x.Id == orderDetail.Id), "OrderDetail added still found.");
-            Assert.IsFalse(await context.Orders.AnyAsync(x => x.Id == orderDetail.OrderId), "Order added still found.");
-            Assert.IsNull(shoppingCart.Order, "Order should be null.");
+            Assert.IsFalse(await context.ShoppingCarts.AnyAsync(x => x.OwnerId == ownerId));
+            Assert.IsFalse(await context.Orders.AnyAsync());
+            Assert.IsFalse(await context.OrderDetails.AnyAsync());
         }
 
         [TestMethod]
@@ -169,6 +163,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -200,6 +195,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -231,6 +227,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -263,6 +260,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -305,6 +303,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -351,6 +350,7 @@ namespace Cstieg.Sales.Test
                 Country = "CA",
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -383,6 +383,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -437,6 +438,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };

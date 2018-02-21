@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cstieg.Sales.Interfaces;
 using Cstieg.Sales.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,7 +18,7 @@ namespace Cstieg.Sales.Test
         public void InitializeShippingScheme()
         {
             // Arrange
-            shippingScheme = new ShippingScheme() { Id = 1, Name = "Default", ShippingCountries = new List<IShippingCountry>() };
+            shippingScheme = new ShippingScheme() { Id = 1, Name = "Default", ShippingCountries = new List<ShippingCountry>() };
 
             shippingCountryUs = new ShippingCountry()
             {
@@ -67,6 +66,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -98,6 +98,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -111,8 +112,8 @@ namespace Cstieg.Sales.Test
             var mockOrderDetail2 = new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 2
             };
             mockShoppingCart.Order.OrderDetails.Add(mockOrderDetail);
@@ -138,6 +139,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -173,6 +175,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -185,8 +188,8 @@ namespace Cstieg.Sales.Test
                 ProductId = sampleProduct.Id,
                 Quantity = 2
             };
-            sampleProduct2.ShippingScheme = shippingScheme;
-            sampleProduct2.ShippingSchemeId = shippingScheme.Id;
+            SampleProduct2.ShippingScheme = shippingScheme;
+            SampleProduct2.ShippingSchemeId = shippingScheme.Id;
 
             mockShoppingCart.Order.OrderDetails.Add(mockOrderDetail);
             context.ShoppingCarts.Add(mockShoppingCart);
@@ -210,6 +213,7 @@ namespace Cstieg.Sales.Test
                 OwnerId = ownerId,
                 Order = new Order()
                 {
+                    Created = DateTime.Now,
                     OrderDetails = new List<OrderDetail>()
                 }
             };
@@ -225,12 +229,12 @@ namespace Cstieg.Sales.Test
             var mockOrderDetail2 = new OrderDetail()
             {
                 PlacedInCart = DateTime.Now,
-                Product = sampleProduct2,
-                ProductId = sampleProduct2.Id,
+                Product = SampleProduct2,
+                ProductId = SampleProduct2.Id,
                 Quantity = 1
             };
-            sampleProduct2.ShippingScheme = shippingScheme;
-            sampleProduct2.ShippingSchemeId = shippingScheme.Id;
+            SampleProduct2.ShippingScheme = shippingScheme;
+            SampleProduct2.ShippingSchemeId = shippingScheme.Id;
 
             mockShoppingCart.Order.OrderDetails.Add(mockOrderDetail);
             mockShoppingCart.Order.OrderDetails.Add(mockOrderDetail2);
