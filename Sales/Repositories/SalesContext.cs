@@ -10,18 +10,18 @@ namespace Cstieg.Sales.Repositories
         public SalesContext(string nameOrConnectionString) : base(nameOrConnectionString) { }
         public SalesContext(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) { }
 
-        public IDbSet<Store> Stores { get; set; }
-        public IDbSet<ShoppingCart> ShoppingCarts { get; set; }
-        public IDbSet<Address> Addresses { get; set; }
-        public IDbSet<Country> Countries { get; set; }
-        public IDbSet<Customer> Customers { get; set; }
-        public IDbSet<Order> Orders { get; set; }
-        public IDbSet<OrderDetail> OrderDetails { get; set; }
-        public IDbSet<Product> Products { get; set; }
-        public IDbSet<PromoCode> PromoCodes { get; set; }
-        public IDbSet<PromoCodeAdded> PromoCodesAdded { get; set; }
-        public IDbSet<ShippingCountry> ShippingCountries { get; set; }
-        public IDbSet<ShippingScheme> ShippingSchemes { get; set; }
-        public IDbSet<WebImage> WebImages { get; set; }
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<PromoCode> PromoCodes { get; set; }
+        public DbSet<PromoCodeAdded> PromoCodesAdded { get; set; }
+        public DbSet<ShippingCountry> ShippingCountries { get; set; }
+        public DbSet<ShippingScheme> ShippingSchemes { get; set; }
+        public DbSet<WebImage> WebImages { get; set; }
     }
 }

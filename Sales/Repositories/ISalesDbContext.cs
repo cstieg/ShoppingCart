@@ -1,4 +1,5 @@
 ﻿using Cstieg.Sales.Models;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Threading.Tasks;
@@ -10,20 +11,21 @@ namespace Cstieg.Sales.Repositories
     /// </summary>
     public interface ISalesDbContext
     {
-        IDbSet<Store> Stores { get; set; }
-        IDbSet<ShoppingCart> ShoppingCarts { get; set; }
-        IDbSet<Address> Addresses { get; set; }
-        IDbSet<Country> Countries { get; set; }
-        IDbSet<Customer> Customers { get; set; }
-        IDbSet<Order> Orders { get; set; }
-        IDbSet<OrderDetail> OrderDetails { get; set; }
-        IDbSet<Product> Products { get; set; }
-        IDbSet<PromoCode> PromoCodes { get; set; }
-        IDbSet<PromoCodeAdded> PromoCodesAdded { get; set; }
-        IDbSet<ShippingCountry> ShippingCountries { get; set; }
-        IDbSet<ShippingScheme> ShippingSchemes { get; set; }
-        IDbSet<WebImage> WebImages { get; set; }
+        DbSet<Store> Stores { get; set; }
+        DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        DbSet<Address> Addresses { get; set; }
+        DbSet<Country> Countries { get; set; }
+        DbSet<Customer> Customers { get; set; }
+        DbSet<Order> Orders { get; set; }
+        DbSet<OrderDetail> OrderDetails { get; set; }
+        DbSet<Product> Products { get; set; }
+        DbSet<PromoCode> PromoCodes { get; set; }
+        DbSet<PromoCodeAdded> PromoCodesAdded { get; set; }
+        DbSet<ShippingCountry> ShippingCountries { get; set; }
+        DbSet<ShippingScheme> ShippingSchemes { get; set; }
+        DbSet<WebImage> WebImages { get; set; }
 
+        DbSet Set(Type entityType);
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         DbEntityEntry Entry(object entity);
         DbEntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
