@@ -11,6 +11,8 @@
     <AssemblyName>Cstieg.Sales</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +38,10 @@
     <AssemblyOriginatorKeyFile>Cstieg.SAles.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cstieg.ObjectHelpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5860376573ffbf57, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ObjectHelper\bin\Release\Cstieg.ObjectHelpers.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -75,33 +81,10 @@
     <Compile Include="Interfaces\IAddress.cs" />
     <Compile Include="Interfaces\ICountry.cs" />
     <Compile Include="Interfaces\IPaymentProviderService.cs" />
-    <Compile Include="Migrations\201801271600379_sales.cs" />
-    <Compile Include="Migrations\201801271600379_sales.Designer.cs">
-      <DependentUpon>201801271600379_sales.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801271746461_sales1.cs" />
-    <Compile Include="Migrations\201801271746461_sales1.Designer.cs">
-      <DependentUpon>201801271746461_sales1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801271954128_nullableOrder.cs" />
-    <Compile Include="Migrations\201801271954128_nullableOrder.Designer.cs">
-      <DependentUpon>201801271954128_nullableOrder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801282131081_ShippingPerOrder.cs" />
-    <Compile Include="Migrations\201801282131081_ShippingPerOrder.Designer.cs">
-      <DependentUpon>201801282131081_ShippingPerOrder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801302002229_FreeShipping.cs" />
-    <Compile Include="Migrations\201801302002229_FreeShipping.Designer.cs">
-      <DependentUpon>201801302002229_FreeShipping.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201802021615084_newest.cs" />
-    <Compile Include="Migrations\201802021615084_newest.Designer.cs">
-      <DependentUpon>201802021615084_newest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Interfaces\IProductService.cs" />
     <Compile Include="Models\PromoCodeAdded.cs" />
     <Compile Include="Models\Store.cs" />
+    <Compile Include="ProductService.cs" />
     <Compile Include="Repositories\ISalesDbContext.cs" />
     <Compile Include="Interfaces\ISalesEntity.cs" />
     <Compile Include="Interfaces\IWebImage.cs" />
@@ -123,26 +106,6 @@
     <Compile Include="ShoppingCartServicePromoCode.cs" />
     <Compile Include="ShoppingCartService.cs" />
     <Compile Include="ShoppingCartShippingSchemeService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201801271600379_sales.resx">
-      <DependentUpon>201801271600379_sales.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801271746461_sales1.resx">
-      <DependentUpon>201801271746461_sales1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801271954128_nullableOrder.resx">
-      <DependentUpon>201801271954128_nullableOrder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801282131081_ShippingPerOrder.resx">
-      <DependentUpon>201801282131081_ShippingPerOrder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801302002229_FreeShipping.resx">
-      <DependentUpon>201801302002229_FreeShipping.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802021615084_newest.resx">
-      <DependentUpon>201802021615084_newest.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -194,12 +157,6 @@
     <Content Include="Views\Shared\_ProductPartial.cshtml" />
     <Content Include="Views\ShoppingCart\Index.cshtml" />
     <Content Include="Views\ShoppingCart\OrderSuccess.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ObjectHelper\ObjectHelper.csproj">
-      <Project>{6e7fcfb9-5536-4418-ac96-60ff5972b9d2}</Project>
-      <Name>ObjectHelper</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

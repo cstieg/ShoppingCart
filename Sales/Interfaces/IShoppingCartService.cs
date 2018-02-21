@@ -73,8 +73,6 @@ namespace Cstieg.Sales.Interfaces
         Task<OrderDetail> DecrementProductAsync(Product product);
         Task<OrderDetail> DecrementProductAsync(int productId);
 
-        
-
         /// <summary>
         /// Removes shipping charges from a single order detail
         /// </summary>

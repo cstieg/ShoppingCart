@@ -19,7 +19,7 @@ namespace Cstieg.Sales
         private ShoppingCart _shoppingCart;
         private string _ownerId;
         private ISalesDbContext _context;
-
+        
         /// <summary>
         /// Constructor for ShoppingCartService
         /// </summary>
@@ -30,7 +30,6 @@ namespace Cstieg.Sales
             _ownerId = ownerId;
             _context = context;
         }
-
 
         public async Task<ShoppingCart> GetShoppingCartAsync()
         {
@@ -56,7 +55,6 @@ namespace Cstieg.Sales
             return _shoppingCart;
         }
 
-        
         public async Task<Product> GetProductAsync(int id)
         {
             try
@@ -68,7 +66,6 @@ namespace Cstieg.Sales
                 throw new NotFoundException("Product not found in database.  Check id!");
             }
         }
-
 
         public async Task<OrderDetail> GetOrderDetailAsync(int id)
         {
@@ -84,7 +81,6 @@ namespace Cstieg.Sales
             }
             return shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
         }
-
 
         public async Task<OrderDetail> AddProductAsync(int productId)
         {
@@ -121,7 +117,6 @@ namespace Cstieg.Sales
             return orderDetail;
         }
 
-
         public async Task RemoveProductAsync(int productId, bool saveChanges = true)
         {
             var product = await GetProductAsync(productId);
@@ -149,7 +144,6 @@ namespace Cstieg.Sales
             }
         }
 
-
         public async Task DeleteShoppingCartAsync()
         {
             var shoppingCart = await GetShoppingCartAsync();
@@ -163,7 +157,6 @@ namespace Cstieg.Sales
             await _context.SaveChangesAsync();
         }
 
-
         public async Task<OrderDetail> IncrementProductAsync(int productId)
         {
             var product = await GetProductAsync(productId);
@@ -173,7 +166,7 @@ namespace Cstieg.Sales
         public async Task<OrderDetail> IncrementProductAsync(Product product)
         {
             var shoppingCart = await GetShoppingCartAsync();
-            var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
+            var orderDetail = shoppingCart.GetOrderDetails().Find(o => o.ProductId == product.Id);
 
             orderDetail.Quantity++;
 
@@ -181,7 +174,6 @@ namespace Cstieg.Sales
             await _context.SaveChangesAsync();
             return orderDetail;
         }
-
 
         public async Task<OrderDetail> DecrementProductAsync(int productId)
         {
@@ -192,7 +184,7 @@ namespace Cstieg.Sales
         public async Task<OrderDetail> DecrementProductAsync(Product product)
         {
             var shoppingCart = await GetShoppingCartAsync();
-            var orderDetail = shoppingCart.Order.OrderDetails.Find(o => o.ProductId == product.Id);
+            var orderDetail = shoppingCart.GetOrderDetails().Find(o => o.ProductId == product.Id);
 
             orderDetail.Quantity--;
 
@@ -221,7 +213,6 @@ namespace Cstieg.Sales
             return shoppingCart;
         }
 
-
         public async Task<ShoppingCart> SetCountryAsync(string countryCode)
         {
             var shoppingCart = await GetShoppingCartAsync();
@@ -229,7 +220,6 @@ namespace Cstieg.Sales
             await UpdateAllShippingChargesAsync();
             return shoppingCart;
         }
-
 
         public async Task VerifyOrderDetailsAsync(List<OrderDetail> orderDetails, decimal total)
         {
@@ -253,7 +243,6 @@ namespace Cstieg.Sales
             }
         }
 
-
         public async Task VerifyCountryAsync(string countryCode)
         {
             var shoppingCart = await GetShoppingCartAsync();
@@ -275,7 +264,6 @@ namespace Cstieg.Sales
                 }
             }
         }
-
 
         public async Task<Order> CheckoutAsync(IAddress shipToAddress, IAddress billToAddress, Customer customer, string cartId)
         {
@@ -339,7 +327,6 @@ namespace Cstieg.Sales
             }
         }
 
-
         /// <summary>
         /// Creates or adds customer from payment provider service to the database context.
         /// </summary>
@@ -400,7 +387,6 @@ namespace Cstieg.Sales
             return addressesForCustomer;
         }
 
-
         /// <summary>
         /// Checks whether the customer object is new to the database (not found in query or newly added to context)
         /// </summary>
@@ -423,7 +409,6 @@ namespace Cstieg.Sales
                 address.Recipient = recipient;
             }
         }
-
 
     }
 }

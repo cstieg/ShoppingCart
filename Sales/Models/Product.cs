@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Cstieg.Sales.Models
@@ -63,6 +64,11 @@ namespace Cstieg.Sales.Models
 
         [Display(Name = "No Display")]
         public virtual bool DoNotDisplay { get; set; }
+
+        public void SortImages()
+        {
+            WebImages = WebImages?.OrderBy(w => w.Order).ToList();
+        }
 
         public override string ToString()
         {
