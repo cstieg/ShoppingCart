@@ -193,8 +193,7 @@ namespace Cstieg.Sales
                     PlacedInCart = DateTime.Now,
                     Shipping = 0M
                 };
-                _context.OrderDetails.Add(orderDetail);
-                shoppingCart.Order.OrderDetails.Add(orderDetail);
+                shoppingCart.GetOrderDetails().Add(orderDetail);
             }
         }
 
