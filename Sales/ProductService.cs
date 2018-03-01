@@ -20,22 +20,45 @@ namespace Cstieg.Sales
 
         public async Task<List<Product>> GetDisplayProductsAsync()
         {
-            return await _context.Products.Where(p => !p.DoNotDisplay).ToListAsync();
+            var products = await _context.Products.Where(p => !p.DoNotDisplay).ToListAsync();
+            return SortAllWebImages(products);
         }
 
         public async Task<List<Product>> GetFrontPageProductsAsync()
         {
-            return await _context.Products.Where(p => p.DisplayOnFrontPage).ToListAsync();
+            var products = await _context.Products.Where(p => p.DisplayOnFrontPage).ToListAsync();
+            return SortAllWebImages(products);
         }
 
         public async Task<List<Product>> GetProductsAsync()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            return SortAllWebImages(products);
         }
 
         public async Task<Product> GetProductAsync(int id)
         {
-            return await _context.Products.FirstAsync(p => p.Id == id);
+            var product = await _context.Products.FirstAsync(p => p.Id == id);
+            return SortWebImages(product);
+        }
+
+        public List<Product> SortAllWebImages(List<Product> products)
+        {
+            foreach (var product in products)
+            {
+                SortWebImages(product);
+            }
+            return products;
+        }
+
+        public Product SortWebImages(Product product)
+        {
+            if (product.WebImages == null)
+            {
+                return product;
+            }
+            product.WebImages = GetSortedWebImages(product.WebImages);
+            return product;
         }
 
         public List<WebImage> GetSortedWebImages(List<WebImage> webImages)
