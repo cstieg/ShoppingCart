@@ -29,7 +29,7 @@ namespace _______________.Controllers
         /// <summary>
         /// Initialize settings that are unabled to be initialized in constructor
         /// </summary>
-        protected async override void Initialize(RequestContext requestContext)
+        protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);
 
