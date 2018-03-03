@@ -73,6 +73,7 @@
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\PromoCodesController.cs" />
+    <Compile Include="Controllers\RssController.cs" />
     <Compile Include="Controllers\ShippingCountriesController.cs" />
     <Compile Include="Controllers\ShippingSchemesController.cs" />
     <Compile Include="Controllers\ShoppingCartController.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Interfaces\IAddress.cs" />
     <Compile Include="Interfaces\ICountry.cs" />
     <Compile Include="Interfaces\IPaymentProviderService.cs" />
+    <Compile Include="Interfaces\IProductExtensionService.cs" />
     <Compile Include="Interfaces\IProductService.cs" />
     <Compile Include="Models\PromoCodeAdded.cs" />
     <Compile Include="Models\Store.cs" />

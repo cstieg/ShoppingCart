@@ -18,7 +18,7 @@ namespace Cstieg.Sales.Models
 
         [Index]
         [StringLength(20)]
-        public virtual string Sku { get;  set; }
+        public virtual string Sku { get; set; }
 
         /// <summary>
         /// Global Trade Item Number (UPC)
@@ -69,6 +69,10 @@ namespace Cstieg.Sales.Models
         {
             WebImages = WebImages?.OrderBy(w => w.Order).ToList();
         }
+
+        public int? ProductExtensionId { get; set; }
+        [NotMapped]
+        public virtual dynamic ProductExtension { get; set; }
 
         public override string ToString()
         {

@@ -6,13 +6,13 @@ namespace Cstieg.Sales.Interfaces
 {
     public interface IProductService
     {
-        Task<List<Product>> GetProductsAsync();
+        Task<List<Product>> GetAllAsync();
 
         Task<List<Product>> GetDisplayProductsAsync();
 
         Task<List<Product>> GetFrontPageProductsAsync();
 
-        Task<Product> GetProductAsync(int id);
+        Task<Product> GetAsync(int id);
 
         List<WebImage> GetSortedWebImages(List<WebImage> webImages);
     }

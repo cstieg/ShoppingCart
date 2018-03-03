@@ -25,11 +25,11 @@ namespace Cstieg.Sales.Test
 
             var fakeProducts = new List<Product>()
             {
-                new Product() { Id = 1, Name = "Product 1", DisplayOnFrontPage = true, DoNotDisplay = false },
-                new Product() { Id = 2, Name = "Product 2", DisplayOnFrontPage = true, DoNotDisplay = false },
-                new Product() { Id = 3, Name = "Product 3", DisplayOnFrontPage = false, DoNotDisplay = false },
-                new Product() { Id = 4, Name = "Product 4", DisplayOnFrontPage = false, DoNotDisplay = false },
-                new Product() { Id = 5, Name = "Product 5", DisplayOnFrontPage = false, DoNotDisplay = true }
+                new Product() { Name = "Product 1", DisplayOnFrontPage = true, DoNotDisplay = false },
+                new Product() { Name = "Product 2", DisplayOnFrontPage = true, DoNotDisplay = false },
+                new Product() { Name = "Product 3", DisplayOnFrontPage = false, DoNotDisplay = false },
+                new Product() { Name = "Product 4", DisplayOnFrontPage = false, DoNotDisplay = false },
+                new Product() { Name = "Product 5", DisplayOnFrontPage = false, DoNotDisplay = true }
             };
             _initialProductCount = fakeProducts.Count();
 
@@ -45,10 +45,10 @@ namespace Cstieg.Sales.Test
         }
 
         [TestMethod]
-        public async Task GetProductsAsync()
+        public async Task GetAllProductsAsync()
         {
             // Act
-            var products = await _productService.GetProductsAsync();
+            var products = await _productService.GetAllAsync();
 
             // Assert
             Assert.AreEqual(_initialProductCount, products.Count, "Wrong number of products returned");
@@ -86,10 +86,73 @@ namespace Cstieg.Sales.Test
             int id = (await context.Products.FirstAsync(p => p.Name == "Product 1")).Id;
 
             // Act
-            var product = await _productService.GetProductAsync(id);
+            var product = await _productService.GetAsync(id);
 
             // Assert
             Assert.AreEqual("Product 1", product.Name);
+        }
+
+        [TestMethod]
+        public async Task GetProductsByNameAsync()
+        {
+            // Act
+            var product = await _productService.GetByNameAsync("Product 1");
+
+            // Assert
+            Assert.AreEqual("Product 1", product.Name);
+        }
+
+        [TestMethod]
+        public async Task AddProductAsync()
+        {
+            // Arrange
+            var newProduct = new Product() { Name = "New Product", Price = 0.01M, Shipping = 0.00M };
+
+            // Act
+            await _productService.AddAsync(newProduct);
+
+            // Assert
+            var newProductInDb = await context.Products.FindAsync(newProduct.Id);
+            Assert.AreEqual("New Product", newProductInDb.Name);
+        }
+
+        [TestMethod]
+        public async Task EditProductAsync()
+        {
+            // Arrange
+            var product = await context.Products.FirstAsync(p => p.Name == "Product 1");
+            product.Name = "New Name";
+
+            // Act
+            await _productService.EditAsync(product);
+
+            // Assert
+            var productInDb = await context.Products.FindAsync(product.Id);
+            Assert.AreEqual("New Name", productInDb.Name);
+        }
+
+        [TestMethod]
+        public async Task DeleteProductAsync()
+        {
+            var product = await context.Products.SingleAsync(p => p.Name == "Product 1");
+
+            // Act
+            await _productService.DeleteAsync(product);
+
+            // Act
+            Assert.IsFalse(await context.Products.AnyAsync(p => p.Name == "Product 1"));
+        }
+
+        [TestMethod]
+        public async Task DeleteProductByIdAsync()
+        {
+            var product = await context.Products.SingleAsync(p => p.Name == "Product 1");
+
+            // Act
+            await _productService.DeleteAsync(product.Id);
+
+            // Act
+            Assert.IsFalse(await context.Products.AnyAsync(p => p.Name == "Product 1"));
         }
 
         [TestMethod]
