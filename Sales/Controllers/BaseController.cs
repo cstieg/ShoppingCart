@@ -14,26 +14,27 @@ namespace _______________.Controllers
     /// </summary>
     public class BaseController : Controller
     {
+        // PayPal service
         private string _paypalConfigFilePath = HostingEnvironment.MapPath("/paypal.json");
         private PayPalClientInfoService _payPalClientInfoService;
         private PayPalPaymentProviderService _payPalService;
 
-        public static string contentFolder = "/content";
-
         // storage service for storing uploaded images
-        protected IFileService storageService;
-        protected ImageManager imageManager;
+        private const string _contentFolder = "/content";
+        private const string _productImagesFolder = "images/products";
+        private IFileService _storageService;
+        protected ImageManager _productImageManager;
+
+        protected ApplicationDbContext _context;
 
         public BaseController()
         {
             // Set storage service for product images
-            storageService = new FileSystemService(contentFolder);
-            imageManager = new ImageManager("images/products", storageService);
+            _storageService = new FileSystemService(_contentFolder);
+            _productImageManager = new ImageManager(_productImagesFolder, _storageService);
+            _context = new ApplicationDbContext();
         }
 
-        /// <summary>
-        /// Add dependency to cache so it is refreshed when updating the dependency
-        /// </summary>
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
@@ -42,24 +43,36 @@ namespace _______________.Controllers
 
         protected async Task<PayPalClientInfoService> GetPayPalClientInfoServiceAsync()
         {
-            if (_payPalClientInfoService != null) return _payPalClientInfoService;
+            if (_payPalClientInfoService != null)
+                return _payPalClientInfoService;
 
             string clientInfoJson = await FileHelper.ReadAllTextAsync(_paypalConfigFilePath);
             _payPalClientInfoService = new PayPalClientInfoService(clientInfoJson);
             return _payPalClientInfoService;
         }
 
-        protected async Task<PayPalClientAccount> GetPayPalClientAccountAsync()
+        protected async Task<PayPalClientAccount> GetActivePayPalClientAccountAsync()
         {
             return (await GetPayPalClientInfoServiceAsync()).GetClientAccount();
         }
 
-        protected async Task<PayPalPaymentProviderService> GetPayPalService()
+        protected async Task<PayPalPaymentProviderService> GetPayPalServiceAsync()
         {
-            if (_payPalService != null) return _payPalService;
+            if (_payPalService != null)
+                return _payPalService;
 
             _payPalService = new PayPalPaymentProviderService(await GetPayPalClientInfoServiceAsync());
             return _payPalService;
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
-}*/
+}
+*/

@@ -1,12 +1,9 @@
 ﻿/*
 using Cstieg.ControllerHelper;
-using Cstieg.FileHelper;
 using Cstieg.Sales;
 using Cstieg.Sales.Exceptions;
 using Cstieg.Sales.Models;
-using Cstieg.Sales.PayPal;
-using Cstieg.Sales.PayPal.Models;
-using _______________.Models;
+using _________________________.Models;
 using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
@@ -14,7 +11,7 @@ using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace _______________.Controllers
+namespace _________________________.Controllers
 {
     /// <summary>
     /// Controller to provide shopping cart view
@@ -39,7 +36,7 @@ namespace _______________.Controllers
         // GET: ShoppingCart
         public async Task<ActionResult> Index()
         {
-            ViewBag.ClientInfo = await GetPayPalClientAccountAsync();
+            ViewBag.ClientInfo = await GetActivePayPalClientAccountAsync();
             //ViewBag.Countries = await db.Countries.ToListAsync();
             ShoppingCart shoppingCart = await _shoppingCartService.GetShoppingCartAsync();
             return View(shoppingCart);
@@ -200,13 +197,13 @@ namespace _______________.Controllers
             catch (InvalidPromoCodeException e)
             {
                 ModelState.AddModelError("PromoCodesAdded", "Failed to add promocode: Invalid promo code - " + e.Message);
-                ViewBag.ClientInfo = await GetPayPalClientAccountAsync();
+                ViewBag.ClientInfo = await GetActivePayPalClientAccountAsync();
                 return View("Index", await _shoppingCartService.GetShoppingCartAsync());
             }
             catch (Exception e)
             {
                 ModelState.AddModelError("PromoCodesAdded", "Failed to add promocode: " + e.Message);
-                ViewBag.ClientInfo = await GetPayPalClientAccountAsync();
+                ViewBag.ClientInfo = await GetActivePayPalClientAccountAsync();
                 return View("Index", await _shoppingCartService.GetShoppingCartAsync());
             }
         }
@@ -226,5 +223,4 @@ namespace _______________.Controllers
         }
 
     }
-}
-*/
+}*/
