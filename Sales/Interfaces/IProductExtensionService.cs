@@ -6,8 +6,11 @@ namespace Cstieg.Sales.Interfaces
 {
     public interface IProductExtensionService
     {
-        Task<Product> GetProductExtension(Product product);
-        Task<List<Product>> GetProductExtensions(List<Product> product);
+        Task<Product> GetProductExtensionAsync(Product product);
+        Task<List<Product>> GetProductExtensionsAsync(List<Product> product);
+        void AddProductExtension(Product product);
+        void EditProductExtension(Product product);
+        void DeleteProductExtension(Product product);
     }
 
 }

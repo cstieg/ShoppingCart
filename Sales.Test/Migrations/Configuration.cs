@@ -7,6 +7,7 @@ namespace Cstieg.Sales.Test.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
             ContextKey = "Sales.Test";
         }
 

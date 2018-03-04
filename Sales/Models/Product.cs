@@ -69,8 +69,7 @@ namespace Cstieg.Sales.Models
         {
             WebImages = WebImages?.OrderBy(w => w.Order).ToList();
         }
-
-        public int? ProductExtensionId { get; set; }
+    
         [NotMapped]
         public virtual dynamic ProductExtension { get; set; }
 
