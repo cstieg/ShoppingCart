@@ -1,0 +1,180 @@
+﻿@model Cstieg.Sales.Models.Order
+
+<div>
+    <h3>Order</h3>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Customer.CustomerName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Customer.CustomerName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.Recipient)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.Recipient)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.Address1)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.Address1)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.City)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.City)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.State)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.State)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.PostalCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.PostalCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.Country)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.Country)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipToAddress.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipToAddress.Phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Customer.EmailAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Customer.EmailAddress)
+        </dd>
+        <hr />
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOrdered)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOrdered)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Subtotal)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Subtotal)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Shipping)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Shipping)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Total)
+        </dd>
+
+    </dl>
+    <hr />
+    <h4>Order Details</h4>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().Product.Sku)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().Product.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().UnitPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().ExtendedPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().Shipping)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetails.First().PlacedInCart)
+            </th>
+        </tr>
+
+        @foreach (var orderDetail in Model.OrderDetails)
+        {
+            <tr>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.Product.Sku)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.Product.Name)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.UnitPrice)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.ExtendedPrice)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.Shipping)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.TotalPrice)
+                </th>
+                <th>
+                    @Html.DisplayFor(model => orderDetail.PlacedInCart)
+                </th>
+            </tr>
+        }
+    </table>
+</div>

@@ -90,6 +90,9 @@
     <Compile Include="Interfaces\IProductService.cs" />
     <Compile Include="Models\PromoCodeAdded.cs" />
     <Compile Include="Models\Store.cs" />
+    <Compile Include="ProductExtensions\IProductExtensionContext.cs" />
+    <Compile Include="ProductExtensions\ProductExtension.cs" />
+    <Compile Include="ProductExtensions\ProductExtensionService.cs" />
     <Compile Include="Repositories\IDbContext.cs" />
     <Compile Include="Repositories\ISalesDbContext.cs" />
     <Compile Include="Interfaces\ISalesEntity.cs" />
@@ -117,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="App_Start\Bundle.config" />
     <None Include="Cstieg.SAles.pfx" />
     <None Include="packages.config" />
     <Content Include="Scripts\Site\ShoppingCart.js" />

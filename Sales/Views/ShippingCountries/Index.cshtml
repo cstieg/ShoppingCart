@@ -1,10 +1,8 @@
 ﻿@model IEnumerable<Cstieg.Sales.Models.ShippingCountry>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Edit Shipping Countries";
 }
-
-<h2>Index</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -38,38 +36,39 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Country.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ShippingScheme.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MinQty)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MaxQty)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AdditionalShipping)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.BaseShippingIsPerItem)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AdditionalShippingIsPerItem)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.FreeShipping)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Country.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ShippingScheme.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MinQty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxQty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalShipping)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BaseShippingIsPerItem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalShippingIsPerItem)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FreeShipping)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
 
 </table>
