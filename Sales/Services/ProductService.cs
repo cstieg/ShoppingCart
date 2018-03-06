@@ -47,9 +47,9 @@ namespace Cstieg.Sales
             return SortWebImages(product);
         }
 
-        public async Task<Product> GetByNameAsync(string name)
+        public async Task<Product> GetByUrlNameAsync(string urlName)
         {
-            var product = await _context.Products.FirstAsync(p => p.Name == name);
+            var product = await _context.Products.FirstAsync(p => p.UrlName == urlName);
             product = await IncludeExtension(product);
             return SortWebImages(product);
         }
