@@ -75,7 +75,7 @@ namespace _________________________.Controllers
         /// <param name="id">ID of Product model to add</param>
         /// <returns>JSON success response if successful, error response if product already exists</returns>
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddItem(int id)
         {
             try

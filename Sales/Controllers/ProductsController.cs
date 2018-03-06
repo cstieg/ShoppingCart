@@ -6,193 +6,159 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 using Cstieg.ControllerHelper;
+using Cstieg.ControllerHelper.ActionFilters;
+using Cstieg.Sales.Models;
 using Cstieg.WebFiles.Controllers;
 using Cstieg.WebFiles;
 using ________________________.Models;
-using Newtonsoft.Json;
-using Cstieg.ControllerHelper.ActionFilters;
-using Cstieg.Sales.Models;
 
 namespace ________________________.Controllers
 {
     /// <summary>
-    /// The controller providing model scaffolding for Products
+    /// Controller to edit product model
     /// </summary>
-    [Authorize(Roles = "Administrator")]
     [ClearCache]
     [RoutePrefix("edit/products")]
     [Route("{action}/{id?}")]
+    [Authorize(Roles = "Administrator")]
+    // Allow HTML in ProductInfo field
     [ValidateInput(false)]
-    public class ProductsController : Controller
+    public class ProductsController : BaseController
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        public static string contentFolder = "/content";
-
-        protected IFileService storageService;
-        protected ImageManager imageManager;
-
-        public ProductsController()
-        {
-            storageService = new FileSystemService(contentFolder);
-            imageManager = new ImageManager("images/products", storageService);
-        }
-
         // GET: Products
         [Route("")]
         public async Task<ActionResult> Index()
         {
-            var products = await db.Products.Include(p => p.ShippingScheme).ToListAsync();
-            foreach (var product in products)
-            {
-                product.WebImages = product.WebImages.OrderBy(w => w.Order).ToList();
-            }
+            var products = await _productService.GetAllAsync();
             return View(products);
         }
 
         // GET: Products/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
+            try
             {
-                return RedirectToAction("Index");
+                var product = await _productService.GetAsync(id);
+                return View(product);
             }
-            Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (product == null)
+            catch
             {
                 return HttpNotFound();
             }
-            return View(product);
+            
         }
 
         // GET: Products/Create
         public async Task<ActionResult> Create()
         {
             // delete images that were previously saved to newly created product that was not ultimately saved
-            foreach (var webImage in await db.WebImages.Where(w => w.ProductId == null).ToListAsync())
+            foreach (var webImage in await _context.WebImages.Where(w => w.ProductId == null).ToListAsync())
             {
                 // remove image files used by product
-                imageManager.DeleteImageWithMultipleSizes(webImage.ImageUrl);
+                _productImageManager.DeleteImageWithMultipleSizes(webImage.ImageUrl);
 
-                db.WebImages.Remove(webImage);
-                await db.SaveChangesAsync();
+                _context.WebImages.Remove(webImage);
+                await _context.SaveChangesAsync();
             }
 
-            ViewBag.ShippingSchemeId = new SelectList(db.ShippingSchemes, "Id", "Name");
+            ViewBag.ShippingSchemeId = new SelectList(_context.ShippingSchemes, "Id", "Name");
             return View();
         }
 
-        /// <summary>
-        /// Creates a new Product model, saving an image to the default imageManager
-        /// </summary>
-        /// <param name="product">The Product model passed from the client</param>
-        /// <returns>If valid POST, redirect to Product Index; otherwise rerender the Create form</returns>
         // POST: Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Product product)
         {
+            await BindProductExtension(Request, product);
             if (ModelState.IsValid)
             {
-                db.Products.Add(product);
-                await db.SaveChangesAsync();
-
-                // connect images that were previously saved to product (id = null)
-                foreach (var webImage in await db.WebImages.Where(w => w.ProductId == null).ToListAsync())
+                try
                 {
-                    webImage.ProductId = product.Id;
-                    db.Entry(webImage).State = EntityState.Modified;
-                    await db.SaveChangesAsync();
+                    await _productService.AddAsync(product);
+
+                    // connect images that were previously saved to product (id = null)
+                    foreach (var webImage in await _context.WebImages.Where(w => w.ProductId == null).ToListAsync())
+                    {
+                        webImage.ProductId = product.Id;
+                        _context.Entry(webImage).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+
+                    return RedirectToAction("Index");
+                }
+                catch (Exception e)
+                {
+                    return HttpNotFound(e.Message);
                 }
 
-                return RedirectToAction("Index");
             }
 
-            ViewBag.ShippingSchemeId = new SelectList(db.ShippingSchemes, "Id", "Name", product.ShippingSchemeId);
+            ViewBag.ShippingSchemeId = new SelectList(_context.ShippingSchemes, "Id", "Name", product.ShippingSchemeId);
             return View(product);
         }
 
         // GET: Products/Edit/5
-        public async Task<ActionResult> Edit(int? id)
+        public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
+            try
             {
-                return RedirectToAction("Index");
+                var product = await _productService.GetAsync(id);
+
+                ViewBag.ShippingSchemeId = new SelectList(_context.ShippingSchemes, "Id", "Name", product.ShippingSchemeId);
+                return View(product);
             }
-            Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (product == null)
+            catch
             {
                 return HttpNotFound();
             }
-
-            // Pass in list of images for product
-            product.WebImages = product.WebImages ?? new List<WebImage>();
-            product.WebImages = product.WebImages.OrderBy(w => w.Order).ToList();
-
-            ViewBag.ShippingSchemeId = new SelectList(db.ShippingSchemes, "Id", "Name");
-            return View(product);
         }
 
-        /// <summary>
-        /// Edits a Product model, saving a new image to the default imageManager, and deleting the old
-        /// </summary>
-        /// <param name="product">The Product model passed from the POST request</param>
-        /// <returns>If valid POST, redirect to Product Index; otherwise rerender the Edit form</returns>
         // POST: Products/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async Task<ActionResult> Edit(Product product)
         {
+            await BindProductExtension(Request, product);
             if (ModelState.IsValid)
             {
-                db.Entry(product).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                try
+                {
+                    await _productService.EditAsync(product);
+                    return RedirectToAction("Index");
+                }
+                catch (Exception e)
+                {
+                    return HttpNotFound(e.Message);
+                }
             }
-
-            ViewBag.ShippingSchemeId = new SelectList(db.ShippingSchemes, "Id", "Name", product.ShippingSchemeId);
+            ViewBag.ShippingSchemeId = new SelectList(_context.ShippingSchemes, "Id", "Name", product.ShippingSchemeId);
             return View(product);
         }
 
         // GET: Products/Delete/5
-        public async Task<ActionResult> Delete(int? id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (id == null)
+            try
             {
-                return RedirectToAction("Index");
+                var product = await _productService.GetAsync(id);
+                return View(product);
             }
-            Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (product == null)
+            catch
             {
                 return HttpNotFound();
             }
-            return View(product);
         }
 
-        /// <summary>
-        /// Deletes a Product model, along with the associated image files
-        /// </summary>
-        /// <param name="id">ID of Product model to be deleted</param>
-        /// <returns>Redirect to Product Index</returns>
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-            // Delete images connected to this product
-            foreach (var webImage in await db.WebImages.Where(w => w.ProductId == product.Id).ToListAsync())
-            {
-                // remove image files used by product
-                imageManager.DeleteImageWithMultipleSizes(webImage.ImageUrl);
-
-                db.WebImages.Remove(webImage);
-                await db.SaveChangesAsync();
-            }
-
-            db.Products.Remove(product);
-            await db.SaveChangesAsync();
+            await _productService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -204,13 +170,22 @@ namespace ________________________.Controllers
         [HttpPost]
         public async Task<ActionResult> AddImage(int? id)
         {
+            int? maxImageOrderNo = 0;
+
+            // Allow null id for newly created product
             if (id != null)
             {
-                Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-                if (product == null)
+                try
+                {
+                    var product = await _productService.GetAsync((int)id);
+                }
+                catch
                 {
                     return this.JError(404, "Can't find product " + id.ToString());
                 }
+
+                // Newly added image should go at end of collection unless purposefully reordered
+                maxImageOrderNo = await _context.WebImages.Where(w => w.ProductId == id).MaxAsync(w => w.Order) ?? 0;
             }
 
             // Check file is exists and is valid image
@@ -223,12 +198,12 @@ namespace ________________________.Controllers
                 WebImage image = new WebImage
                 {
                     ProductId = id,
-                    ImageUrl = await imageManager.SaveFile(imageFile, 200, timeStamp),
-                    ImageSrcSet = await imageManager.SaveImageMultipleSizes(imageFile, new List<int>() { 1600, 800, 400, 200 }, timeStamp)
+                    ImageUrl = await _productImageManager.SaveFile(imageFile, 200, timeStamp),
+                    ImageSrcSet = await _productImageManager.SaveImageMultipleSizes(imageFile, new List<int>() { 1600, 800, 400, 200 }, timeStamp),
+                    Order = maxImageOrderNo + 1
                 };
-                db.WebImages.Add(image);
-                await db.SaveChangesAsync();
-
+                _context.WebImages.Add(image);
+                await _context.SaveChangesAsync();
                 return PartialView("_ProductImagePartial", image);
             }
             catch (Exception e)
@@ -245,24 +220,27 @@ namespace ________________________.Controllers
         [HttpPost]
         public async Task<JsonResult> DeleteImage(int id)
         {
-            Product product = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (product == null)
+            try
+            {
+                var product = await _productService.GetAsync(id);
+            }
+            catch
             {
                 return this.JError(404, "Can't find product " + id.ToString());
             }
 
             int imageId = int.Parse(Request.Params.Get("imageId"));
-            WebImage image = await db.WebImages.FirstOrDefaultAsync(w => w.Id == imageId);
+            WebImage image = await _context.WebImages.FindAsync(imageId);
             if (image == null)
             {
                 return this.JError(404, "Can't find image " + imageId.ToString());
             }
 
             // remove image files used by product
-            imageManager.DeleteImageWithMultipleSizes(image.ImageUrl);
+            _productImageManager.DeleteImageWithMultipleSizes(image.ImageUrl);
 
-            db.WebImages.Remove(image);
-            await db.SaveChangesAsync();
+            _context.WebImages.Remove(image);
+            await _context.SaveChangesAsync();
             return new JsonResult
             {
                 Data = new
@@ -277,14 +255,18 @@ namespace ________________________.Controllers
         /// Updates the model from the Index table using EditIndex.js
         /// </summary>
         /// <param name="id">The Id of the model to update</param>
-        /// <returns>A Json object indicating success status.  
-        /// In case of error, returns object with data member containing the old product model,
+        /// <returns>A Json object indicating success status.  In case of error, returns object with data member containing the old product model,
         /// and the field causing the error if possible</returns>
         [HttpPost]
         public async Task<JsonResult> Update(int id)
         {
-            Product existingProduct = await db.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (existingProduct == null)
+            Product existingProduct;
+     
+            try
+            {
+                existingProduct = await _productService.GetAsync(id);
+            }
+            catch
             {
                 return this.JError(404, "Can't find this product to update!");
             }
@@ -294,13 +276,13 @@ namespace ________________________.Controllers
                 Product newProduct = JsonConvert.DeserializeObject<Product>(Request.Params.Get("data"));
                 newProduct.Id = id;
 
-                db.Entry(existingProduct).State = EntityState.Detached;
-                db.Entry(newProduct).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _context.Entry(existingProduct).State = EntityState.Detached;
+                _context.Entry(newProduct).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
             }
             catch (JsonReaderException e)
             {
-                var returnData = JsonConvert.SerializeObject(new { product = existingProduct, error = e.Message, field = e.Path});
+                var returnData = JsonConvert.SerializeObject(new { product = existingProduct, error = e.Message, field = e.Path });
                 return this.JError(400, "Invalid data!", returnData);
             }
             catch (Exception e)
@@ -319,28 +301,31 @@ namespace ________________________.Controllers
         [HttpPost]
         public async Task<JsonResult> OrderWebImages(int? id)
         {
-            List <WebImage> webImages= await db.WebImages.Where(w => w.ProductId == id).ToListAsync();
+            List<WebImage> webImages = await _context.WebImages.Where(w => w.ProductId == id).ToListAsync();
 
             List<string> imageOrder = JsonConvert.DeserializeObject<List<string>>(Request.Params.Get("imageOrder"));
             for (int i = 0; i < imageOrder.Count(); i++)
             {
                 string imageId = imageOrder[i];
-                WebImage webImage = await db.WebImages.FirstOrDefaultAsync(w => w.Id == int.Parse(imageId));
+                WebImage webImage = await _context.WebImages.FindAsync(int.Parse(imageId));
                 webImage.Order = i;
-                db.Entry(webImage).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _context.Entry(webImage).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
             }
             return this.JOk();
         }
 
-        protected override void Dispose(bool disposing)
+        private async Task BindProductExtension(HttpRequestBase request, Product product)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
+            ProductExtension productExtension = await _context.ProductExtensions.SingleOrDefaultAsync(p => p.ProductId == product.Id)
+                ?? new ProductExtension();
+            productExtension.Product = product;
+            productExtension.ProductId = product.Id;
+            productExtension.Diameter = decimal.Parse(request.Unvalidated.Form.Get("Diameter"));
+
+            product.ProductExtension = productExtension;
         }
+
     }
 }
 */

@@ -1,13 +1,12 @@
 ﻿/*
 using System.Data.Entity;
 using System.Threading.Tasks;
-using System.Net;
 using System.Web.Mvc;
 using Cstieg.Sales.Models;
-using ________________________.Models;
+using _________________________.Models;
 using Cstieg.ControllerHelper.ActionFilters;
 
-namespace ________________________.Controllers.ModelControllers
+namespace _________________________.Controllers.ModelControllers
 {
     [Authorize(Roles = "Administrator")]
     [ClearCache]
@@ -27,13 +26,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: ShippingCountries/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ShippingCountry shippingCountry = await db.ShippingCountries.FirstOrDefaultAsync(s => s.Id == id);
+            ShippingCountry shippingCountry = await db.ShippingCountries.FindAsync(id);
             if (shippingCountry == null)
             {
                 return HttpNotFound();
@@ -53,7 +48,7 @@ namespace ________________________.Controllers.ModelControllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,ShippingSchemeId,CountryId,MinQty,MaxQty,AdditionalShipping,BaseShippingIsPerItem,AdditionalShippingIsPerItem,FreeShipping")] ShippingCountry shippingCountry)
+        public async Task<ActionResult> Create(ShippingCountry shippingCountry)
         {
             if (ModelState.IsValid)
             {
@@ -68,13 +63,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: ShippingCountries/Edit/5
-        public async Task<ActionResult> Edit(int? id)
+        public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ShippingCountry shippingCountry = await db.ShippingCountries.FirstOrDefaultAsync(s => s.Id == id);
+            ShippingCountry shippingCountry = await db.ShippingCountries.FindAsync(id);
             if (shippingCountry == null)
             {
                 return HttpNotFound();
@@ -87,7 +78,7 @@ namespace ________________________.Controllers.ModelControllers
         // POST: ShippingCountries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,ShippingSchemeId,CountryId,MinQty,MaxQty,AdditionalShipping,BaseShippingIsPerItem,AdditionalShippingIsPerItem,FreeShipping")] ShippingCountry shippingCountry)
+        public async Task<ActionResult> Edit(ShippingCountry shippingCountry)
         {
             if (ModelState.IsValid)
             {
@@ -101,13 +92,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: ShippingCountries/Delete/5
-        public async Task<ActionResult> Delete(int? id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ShippingCountry shippingCountry = await db.ShippingCountries.FirstOrDefaultAsync(s => s.Id == id);
+            ShippingCountry shippingCountry = await db.ShippingCountries.FindAsync(id);
             if (shippingCountry == null)
             {
                 return HttpNotFound();
@@ -120,7 +107,7 @@ namespace ________________________.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            ShippingCountry shippingCountry = await db.ShippingCountries.FirstOrDefaultAsync(s => s.Id == id);
+            ShippingCountry shippingCountry = await db.ShippingCountries.FindAsync(id);
             db.ShippingCountries.Remove(shippingCountry);
             await db.SaveChangesAsync();
             return RedirectToAction("Index");

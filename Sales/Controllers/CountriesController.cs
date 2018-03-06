@@ -9,7 +9,7 @@ using ________________________.Models;
 
 namespace ________________________.Controllers.ModelControllers
 {
-    [Authorize(Roles = "Administrator")]
+[Authorize(Roles = "Administrator")]
     [ClearCache]
     [RoutePrefix("edit/countries")]
     [Route("{action}/{id?}")]
@@ -25,13 +25,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: Countries/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Country country = await db.Countries.FirstOrDefaultAsync(c => c.Id == id);
+            Country country = await db.Countries.FindAsync(id);
             if (country == null)
             {
                 return HttpNotFound();
@@ -48,7 +44,7 @@ namespace ________________________.Controllers.ModelControllers
         // POST: Countries/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Name,IsoCode2")] Country country)
+        public async Task<ActionResult> Create(Country country)
         {
             if (ModelState.IsValid)
             {
@@ -61,13 +57,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: Countries/Edit/5
-        public async Task<ActionResult> Edit(int? id)
+        public async Task<ActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Country country = await db.Countries.FirstOrDefaultAsync(c => c.Id == id);
+            Country country = await db.Countries.FindAsync(id);
             if (country == null)
             {
                 return HttpNotFound();
@@ -78,7 +70,7 @@ namespace ________________________.Controllers.ModelControllers
         // POST: Countries/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Name,IsoCode2")] Country country)
+        public async Task<ActionResult> Edit(Country country)
         {
             if (ModelState.IsValid)
             {
@@ -90,13 +82,9 @@ namespace ________________________.Controllers.ModelControllers
         }
 
         // GET: Countries/Delete/5
-        public async Task<ActionResult> Delete(int? id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Country country = await db.Countries.FirstOrDefaultAsync(c => c.Id == id);
+            Country country = await db.Countries.FindAsync(id);
             if (country == null)
             {
                 return HttpNotFound();
