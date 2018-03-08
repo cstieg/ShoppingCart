@@ -213,6 +213,15 @@ namespace Cstieg.Sales
             return shoppingCart;
         }
 
+        public async Task<ShoppingCart> SetMessageToSellerAsync(string messageToSeller)
+        {
+            var shoppingCart = await GetShoppingCartAsync();
+            shoppingCart.Order.NoteToPayee = messageToSeller;
+            _context.Entry(shoppingCart.Order).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return shoppingCart;
+        }
+
         public async Task<ShoppingCart> SetCountryAsync(string countryCode)
         {
             var shoppingCart = await GetShoppingCartAsync();
